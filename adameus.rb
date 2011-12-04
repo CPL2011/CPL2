@@ -72,4 +72,18 @@ class Adameus
   end
   
   private :open_host, :close_host, :query_host
+
+  def repl
+    while true do
+      puts 'Enter Query'
+      x = eval gets
+      puts '---BEGIN---'
+      puts x 
+      puts '---END---'
+    end
+  end
 end
+
+
+adameus = Adameus.new
+adameus.repl
