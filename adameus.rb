@@ -20,21 +20,55 @@ class Adameus
     @host.puts(query)
     @answer = @host.waitfor(true)
     close_host
+    @answer
   end
   
   def version
     query_host("V")
-    @answer
   end
   
   def airlines
     query_host("A")
-    @answer
   end
   
   def airports
     query_host("P")
-    @answer
+  end
+  
+  def destinations(airport)
+    query_host("D" + airport)
+  end
+  
+  def connections(departure, arrival, date)
+    query_host("C" + departure + arrival + date)
+  end
+  
+  def flight_airports(flightnumber)
+    query_host("F" + flightnumber)
+  end
+  
+  def weekdays(flightnumber)
+    query_host("W" + flightnumber)
+  end
+  
+  def seats(date, flightnumber, seatclass)
+    query_host("S" + date + flightnumber + seatclass)
+  end
+  
+  def hold(date, flightnumber, seatclass, gender, firstname, surname)
+    query_host("H" + date + flightnumber + seatclass + gender + firstname + surname)
+  end
+  
+  def book(bookingcode)
+    query_host("B" + bookingcode)
+  end
+  
+  def cancel(bookingcode)
+    query_host("X" + bookingcode)
+  end
+  
+  def query_booking(bookingcode)
+    query_host("Q" + bookingcode)
   end
   
   private :open_host, :close_host, :query_host
