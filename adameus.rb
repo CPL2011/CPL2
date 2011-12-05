@@ -76,7 +76,7 @@ class Adameus
   def repl
     while true do
       puts 'Enter Query'
-      x = eval gets
+      x = eval gets       #eval does not work so good. functions with 0-1 arguments work, but others do not (the argument must be put between '' => destinations 'VIE')
       puts '---BEGIN---'
       puts x 
       puts '---END---'
