@@ -96,8 +96,6 @@ class Adameus
     query_host("Q" + bookingcode.to_s)
   end
   
-  private :open_host, :close_host, :query_host
-
   def repl
     while true do
       puts 'Enter Query'
@@ -115,4 +113,9 @@ class Adameus
       end
     end
   end
+  
+  alias :execute :instance_eval
+  
+  private :open_host, :close_host, :query_host
+
 end

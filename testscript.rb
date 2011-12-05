@@ -1,12 +1,17 @@
 require_relative 'adameus'
 
-a = Adameus.new
+Adameus.new.execute do
+  puts version
+  puts connections('VIE', 'BRU', '2012-01-15')
+end
 
 =begin
-  example queries:
+  Example queries:
   airports
   connections('VIE', 'BRU', '2012-01-15'), also connections(:VIE, :BRU, '2012-01-15')
   seats('2012-01-15', 'BEL062', 'B'), also seats('2012-01-15', :BEL062, :B)
+  
+  To exit interactive mode, enter query 'exit'.
 =end
 
-a.repl
+Adameus.new.repl
