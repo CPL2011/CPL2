@@ -55,7 +55,8 @@ class Adameus
   def airports
     query_host("P")
   end
-  
+
+
   def destinations(airport)
     query_host("D" + airport.to_s)
   end
@@ -119,3 +120,26 @@ class Adameus
   private :open_host, :close_host, :query_host
 
 end
+
+
+def findpath(airportDepartureCode, airportDestinationCode, visited)
+  destinationArray = destinations(airportDepartureCode).split
+  visited.push(airportDepartureCode)
+
+  if (destinationArray.include?(airportDestinationCode))
+    visited.push(airportDestinationCode)
+    return visited
+  else 
+    destinationArray.each do |x| 
+      if (!visited.include?(x)) then
+        return findpath(x, airportDestinationCode, visited);
+      end
+    end
+  end
+  return []
+end
+
+def flighthops(airportDepartureCode, airportDestinationCode)
+  findpath(airportDepartureCode, airportDestinationCode, [])
+end
+
