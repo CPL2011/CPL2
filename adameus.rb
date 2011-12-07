@@ -97,30 +97,18 @@ class Adameus
     query_host("Q" + bookingcode.to_s)
   end
   
-  def repl
-    while true do
-      puts 'Enter Query'
-      entry = gets.chomp
-      if(entry == "exit")
-        break
-      else
-        response = eval(entry)      #eval does not work so good. functions with 0-1 arguments work, but others do not (the argument must be put between '' => destinations 'VIE')
-        if(response.nil?)
-          puts 'Response Empty'
-        else
-          puts 'Response:'
-          puts response
-        end
-      end
-    end
-  end
-  
-  alias :execute :instance_eval
-  
-  private :open_host, :close_host, :query_host
-
+def loadfile(path)
+  file = File.open(path)
+	file.each {|line|
+	  response = self.send(*line.split(/\s+/)) 
+		    if(response.nil?)
+		      puts 'Response Empty'
+		    else
+		      puts 'Response:'
+		      puts response
+		    end
+	}
 end
-
 
 def findpath(airportDepartureCode, airportDestinationCode, visited)
   destinationArray = destinations(airportDepartureCode).split
@@ -143,6 +131,15 @@ def flighthops(airportDepartureCode, airportDestinationCode)
   findpath(airportDepartureCode, airportDestinationCode, [])
 end
 
+  alias :execute :instance_eval
+  
+  private :open_host, :close_host, :query_host
+
+end
+
+
+
+def repl
 adameus = Adameus.new
 while true do
       puts 'Enter Query'
@@ -159,3 +156,5 @@ while true do
         end
       end
 end
+end
+repl
