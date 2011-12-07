@@ -143,3 +143,19 @@ def flighthops(airportDepartureCode, airportDestinationCode)
   findpath(airportDepartureCode, airportDestinationCode, [])
 end
 
+adameus = Adameus.new
+while true do
+      puts 'Enter Query'
+      entry = gets.chomp
+      if(entry == "exit")
+        break
+      else
+        response = adameus.send(*entry.split(/\s+/)) 
+        if(response.nil?)
+          puts 'Response Empty'
+        else
+          puts 'Response:'
+          puts response
+        end
+      end
+end
