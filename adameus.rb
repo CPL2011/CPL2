@@ -1,4 +1,5 @@
 require 'net/telnet'
+require_relative 'MultiHop'
 
 class String
   # If this string is shorter than len, returns an extended version of this string with padding of spaces,
@@ -129,6 +130,10 @@ end
 
 def flighthops(airportDepartureCode, airportDestinationCode)
   findpath(airportDepartureCode, airportDestinationCode, [])
+end
+
+def l
+  MultiHop.new.findFirst("PEK")
 end
 
   alias :execute :instance_eval
