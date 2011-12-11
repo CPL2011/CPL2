@@ -44,13 +44,19 @@ class Date
     end
   end
   
-  def addTimeToDate(addTime)
-    time = MyTime.new(addTime)
+  def addTimeToDate(time)
+    if (!time.class.to_s.eql?("MyTime"))
+      time = MyTime.new(time)
+    end
     return @date + time.seconds
   end
 
-  def compare(date, time)
-    return date <=> Date.new(date, time).date
+  def compare(givenDate, givenTime)
+    if (givenDate.class.to_s.eql?("Date") && givenTime == nil) 
+      return date <=> givenDate.date
+    else
+      return date <=> Date.new(givenDate, givenTime).date
+    end
   end
 end
 
@@ -64,9 +70,12 @@ class MyTime
   end
 end
 
-
 test1 = Date.new("2011-03-12", "10:30")
 test2 = Date.new("2011-03-12", nil)
 puts test1.date
 puts test2.date
 puts test1.addTimeToDate("17:55")
+timeToAdd = MyTime.new("17:55")
+puts test1.addTimeToDate(timeToAdd)
+puts test1.compare("2011-03-12", "10:29")
+puts test1.compare(test1, nil)
