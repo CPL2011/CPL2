@@ -106,7 +106,12 @@ class Adameus
   def query_booking(bookingcode)
     query_host("Q" + bookingcode.to_s)
   end
-  
+
+  # def priceOfFlight(date, seatClass, airportDepartureCode, airportDestinationCode)
+  #   MultiHop.new.findHops(airportDepartureCode, airportDestinationCode)
+  #   query_host("S" + date.to_s + flightnumber.to_s + seatclass.to_s)
+  # end
+
 def loadfile(path)
   file = File.open(path)
 	file.each {|line|

@@ -1,3 +1,5 @@
+require_relative 'Airport'
+
 class MultiHop
   @airports = []
   
@@ -10,10 +12,10 @@ class MultiHop
     return "Airport not found"
   end
   
-  def findHops
+  def findHops(rootCode, goalCode)
     self.loadGraph
-    root = findAirport('PEK')
-    goal = findAirport('AKL')
+    root = findAirport(rootCode)
+    goal = findAirport(goalCode)
     
     return IDDFS(root,goal)
   end
@@ -74,33 +76,3 @@ class MultiHop
   end
 end
 
-class Airport
-  def init
-    @Code = ""
-    @Conn = []
-  end
-  
-  def connections
-    return @Conn
-  end
-  
-  def addConnection(conn)
-    @Conn.push(conn)
-  end
-  
-  def code
-    return @Code
-  end
-  
-  def setCode(code)
-    @Code = code
-  end
-  
-  def equals(airp)
-    return (@Code == airp.code)
-  end
-  
-  def to_s
-    return @Code
-  end
-end

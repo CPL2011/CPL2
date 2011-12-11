@@ -6,8 +6,9 @@ Adameus.new.execute do
   puts connections('VIE', 'BRU', '2012-01-15')
   #puts destinations('BRU')
 
-# puts MultiHop.new.findHops('PEK', 'AKL')
+ puts MultiHop.new.findHops('PEK', 'AKL')
  reservation = hold("2011-11-05", "BEL062", "B", "M", "John", "Doe")
+  
  puts book(reservation[1,reservation.size-2])
 
 #   puts "startmultihop"
