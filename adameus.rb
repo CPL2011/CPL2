@@ -87,7 +87,16 @@ class Adameus
   end
   
   def book(bookingcode)
-    query_host("B" + bookingcode.to_s)
+    if (bookingcode.size == 32)
+      output = query_host("B" + bookingcode.to_s) 
+      if output.chomp() == "FN" 
+        return "invalid booking number"
+      elsif output.chomp() == "FA" 
+        return "the seat has already been booked"
+      else 
+        return output.chomp()
+      end
+    end
   end
   
   def cancel(bookingcode)
@@ -133,7 +142,7 @@ def flighthops(airportDepartureCode, airportDestinationCode)
 end
 
 def l
-  MultiHop.new.findHops
+  MultiHop.new.findHops('PEK', 'AKL')
 end
 
   alias :execute :instance_eval
@@ -162,4 +171,4 @@ while true do
       end
 end
 end
-repl
+#repl
