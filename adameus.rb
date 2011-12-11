@@ -133,7 +133,7 @@ def flighthops(airportDepartureCode, airportDestinationCode)
 end
 
 def l
-  MultiHop.new.findFirst("PEK")
+  MultiHop.new.findHops
 end
 
   alias :execute :instance_eval
