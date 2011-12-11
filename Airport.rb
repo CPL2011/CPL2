@@ -1,6 +1,9 @@
 class Airport
-  def init
-    @Code = ""
+  attr_reader :code
+
+  def initialize(code)
+    raise "Missing code" if code.nil? # code is compulsory
+    @code = code
     @Conn = []
   end
   
@@ -12,19 +15,11 @@ class Airport
     @Conn.push(conn)
   end
   
-  def code
-    return @Code
-  end
-  
-  def setCode(code)
-    @Code = code
-  end
-  
   def equals(airp)
-    return (@Code == airp.code)
+    return (@code == airp.code)
   end
   
   def to_s
-    return @Code
+    return @code
   end
 end

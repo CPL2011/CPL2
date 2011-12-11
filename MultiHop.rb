@@ -52,9 +52,7 @@ class MultiHop
     ad = Adameus.new
     @airports = []
     ad.airports.split(/\n/).each do |airport|
-      a = Airport.new
-      a.init
-      a.setCode(airport[0,3])
+      a = Airport.new(airport[0,3])
       @airports.push(a)
     end
     

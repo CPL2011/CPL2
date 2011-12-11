@@ -25,7 +25,7 @@ class Flight
   #BEL06215:1001:35
   
   def bestConnection(departureCode, arrivalCode, departureDate)
-  
+    
   end
   
   # returns the total estimated time the traveller will be airbone 
