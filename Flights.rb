@@ -1,6 +1,6 @@
 require_relative 'Airport'
 
-# The Flight class represents one or a series of connections between airports.
+# The Flights class represents one or a series of connections between airports.
 # It consists of a number of airports, the first one being the departure airport,
 # and the last one being the destination.
 class Flights
