@@ -1,6 +1,54 @@
 require_relative 'Flight'
 require_relative 'adameus'
 
+class GroupTicket
+  def initialize(flights, seatclass, gender, firstname, surname, nbOfTickets)
+    #might be better to wait this one out until I have a better idea of 
+    #what they're actually lookin for.
+  end
+end
+
+# A Compound ticket represents a ticket for a sequence of flights.
+# NOTE! currently the 'each' def is called a lot, I'm not pleased with it, looking for a 
+# more elegant operator.
+class CompoundTicket
+  attr_reader :compoundTicket
+  def initialize(flights, seatclass, gender, firstname, surname)
+    @compoundTicket = []
+    flights.each do |flight|
+      ticket = Ticket.new(flight, seatclass, gender, firstname, surname)
+      @compoundTicket.push(ticket)
+    end
+  end
+  
+  def hold
+    compoundTicket.each do |ticket| 
+      ticket.hold
+    end
+  end
+
+  def book
+    compoundTicket.each do |ticket|
+      ticket.book
+    end
+  end
+
+  def cancel
+    compoundTicket.each do |ticket|
+      ticket.cancel
+    end
+  end
+  
+  def status
+    compoundTicket.each do |ticket|
+      ticket.status
+    end
+  end  
+end
+
+
+
+
 class Ticket
   attr_reader :booking, :flight, :seatclass, :adameus, :gender, :firstname, :surname
   SEVEN_DAYS = 604800
@@ -11,7 +59,6 @@ class Ticket
     @gender = gender
     @firstname = firstname
     @surname = surname
-    Struct.new("Booking", :bookingCode, :timeStamp)
     @booking = Struct::Booking.new(nil, nil)
     @adameus = adameus = Adameus.new 
   end
@@ -42,11 +89,17 @@ class Ticket
   end
 end
 
+Struct.new("Booking", :bookingCode, :timeStamp)
+
 #-SOME-TESTS--------------------------------------------------------------------
 date = '2012-01-15'
 adameus = Adameus.new
 conns = adameus.connections('VIE', 'BRU', date).split(/\n/)
-myFlight = Flight.new(conns[1], date)
+myFlight1 = Flight.new(conns[0], date)
+myFlight2 = Flight.new(conns[1], date)
+myCompoundTicket = CompoundTicket.new([myFlight1, myFlight2], 'B', 'M', 'Mr.', 'Burns')
+myCompoundTicket.hold
+myFlight = Flight.new(conns[0], date)
 puts myFlight.price('F')
 puts myFlight.departure
 puts myFlight.destination
