@@ -22,6 +22,7 @@ class Flight
   # NOTE TO SELF: curiously enough the call to .to_s for date is not required 
   def price(seatClass)
     seatInfo = adameus.seats(date, flightCode, seatClass).chomp
+    puts seatInfo
     if (seatInfo.size != 8) then return nil end 
     nbOfSeats = seatInfo[0,3]
     seatCost = seatInfo[3,5]

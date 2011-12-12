@@ -17,6 +17,34 @@ class CompoundTicket
     end
   end
   
+  def to_s
+    flights = @compoundTicket.inject("") do |acc, ticket|
+      acc + ticket.flight.departure + "=>" 
+    end
+    flightString = flights + compoundTicket.last.flight.destination    
+    if (compoundTicket.last.gender.eql?("M")) then 
+      title = "Mr." 
+    else title = "Mrs." end
+    
+    if (compoundTicket.last.seatclass.eql?("E")) then 
+      seatclass = "Economy class" 
+    elsif (compoundTicket.last.seatclass.eql?("B")) then 
+      seatclass = "Business class" 
+    else seatclass = "First class" end
+    price = compoundTicket.inject(0) do |acc, ticket| #PRICE CAN'T HANDLE SITUATION YET WITH ZERO CHAIRS, PROBABLY SHOULDN'T
+      #BE CALLED IN THAT CASE OR SOME OTHER TECHNIQUE SHOULD BE USED
+      acc + ticket.flight.price(ticket.seatclass).to_i
+    end
+    ticketOpening = "-----------TICKET-------------\n"
+    customer = title + " " + compoundTicket.last.firstname.strip + " " + compoundTicket.last.surname.strip + "\n"
+    travel = "route = " + flightString + "\n"
+    seat = "seat = " + seatclass + "\n"
+    travelCost = "price = " + price.to_s + "\n"
+    ticketClosure = "------------------------------\n"
+
+    return ticketOpening + customer + travel + seat + travelCost + ticketClosure
+  end
+
   def hold
     compoundTicket.each do |ticket| 
       ticket.hold
@@ -91,27 +119,29 @@ Struct.new("Booking", :bookingCode, :timeStamp)
 date = '2012-01-15'
 adameus = Adameus.new
 conns = adameus.connections('VIE', 'BRU', date).split(/\n/)
+conns2 = adameus.connections('BRU', 'FRA', date).split(/\n/)
 myFlight1 = Flight.new(conns[0], date)
-myFlight2 = Flight.new(conns[1], date)
-myCompoundTicket = CompoundTicket.new([myFlight1, myFlight2], 'B', 'M', 'Mr.', 'Burns')
+myFlight2 = Flight.new(conns2[0], date)
+myCompoundTicket = CompoundTicket.new([myFlight1, myFlight2], 'E', 'M', 'Edsger', 'Dijkstra')
 puts myCompoundTicket.hold
-myFlight = Flight.new(conns[0], date)
-puts myFlight.price('F')
-puts myFlight.departure
-puts myFlight.destination
+puts myCompoundTicket.to_s
+# myFlight = Flight.new(conns[0], date)
+# puts myFlight.price('F')
+# puts myFlight.departure
+# puts myFlight.destination
 
-myTicket = Ticket.new(myFlight, 'F', 'M', 'Mr.', 'Burns')
-puts "----"
-puts myTicket.hold
-puts myTicket.status
+# myTicket = Ticket.new(myFlight, 'F', 'M', 'Mr.', 'Burns')
 
-puts myTicket.cancel
+# puts myTicket.hold
+# puts myTicket.status
 
-puts myTicket.hold
-puts myTicket.status
+# puts myTicket.cancel
 
-puts myTicket.book
-puts myTicket.status
+# puts myTicket.hold
+# puts myTicket.status
 
-puts myTicket.cancel
+# puts myTicket.book
+# puts myTicket.status
+
+# puts myTicket.cancel
 #-------------------------------------------------------------------------------
