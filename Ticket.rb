@@ -9,15 +9,11 @@ class GroupTicket
 end
 
 # A Compound ticket represents a ticket for a sequence of flights.
-# NOTE! currently the 'each' def is called a lot, I'm not pleased with it, looking for a 
-# more elegant operator.
 class CompoundTicket
   attr_reader :compoundTicket
   def initialize(flights, seatclass, gender, firstname, surname)
-    @compoundTicket = []
-    flights.each do |flight|
-      ticket = Ticket.new(flight, seatclass, gender, firstname, surname)
-      @compoundTicket.push(ticket)
+    @compoundTicket = flights.map do |flight|
+      Ticket.new(flight, seatclass, gender, firstname, surname)
     end
   end
   
@@ -98,13 +94,14 @@ conns = adameus.connections('VIE', 'BRU', date).split(/\n/)
 myFlight1 = Flight.new(conns[0], date)
 myFlight2 = Flight.new(conns[1], date)
 myCompoundTicket = CompoundTicket.new([myFlight1, myFlight2], 'B', 'M', 'Mr.', 'Burns')
-myCompoundTicket.hold
+puts myCompoundTicket.hold
 myFlight = Flight.new(conns[0], date)
 puts myFlight.price('F')
 puts myFlight.departure
 puts myFlight.destination
 
-myTicket = Ticket.new(myFlight, 'B', 'M', 'Mr.', 'Burns')
+myTicket = Ticket.new(myFlight, 'F', 'M', 'Mr.', 'Burns')
+puts "----"
 puts myTicket.hold
 puts myTicket.status
 
