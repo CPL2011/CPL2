@@ -112,5 +112,5 @@ puts test1.addTimeToDate("17:55")
 timeToAdd = MyTime.new("17:55")
 puts test1.addTimeToDate(timeToAdd)
 puts test1.compare("2011-03-12", "10:29")
-puts test1.compare(test1, nil)
+puts test2.compare(test1, nil)
 #-------------------------------------------------------------------------------
