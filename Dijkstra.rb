@@ -6,6 +6,7 @@ class MultiDijkstraHop
 def initialize
 @airports = []
 @INFINITY = 1 << 32
+@loaded = false
 end
   def findAirport(startCode)
     @airports.each do |airport|
@@ -16,12 +17,14 @@ end
     return "Airport not found"
   end
   
-  def findHops(rootCode, goalCode)
-    self.loadGraph
+  def findHops(rootCode, goalCode, proc)
+	if not @loaded
+		self.loadGraph
+		@loaded = true
+    end
     root = findAirport(rootCode)
     goal = findAirport(goalCode)
-    
-    return dijkstra(root,goal,Proc.new{|x,y|1})
+    return dijkstra(root,goal,proc)
   end
   
   def loadGraph 
@@ -33,7 +36,7 @@ end
     end
     
     @airports.each do |airport|
-    p "d"
+    
       loadAirport(airport,ad.destinations(airport.code))
     end
   end
@@ -58,37 +61,62 @@ def dijkstra(source, destination, calcweight)
 		shortest_distances[a]=@INFINITY
 		previous[a]= nil
 	end
-
+	
+	
 	pq = PQueue.new(proc {|x,y| shortest_distances[x] < shortest_distances[y]})
-
+	
 	pq.push(source)
 	visited[source] = true
 	shortest_distances[source] = 0
 	node = pq.pop
-	while node != destination
+	
+	
+	while node != destination and not node.nil?
 		
 		visited[node] = true
 		
 		#if edges[v]
 			node.connections.each do  |w|
-				weight = calcweight.call(node,w)
-				if !visited[w] and    shortest_distances[w] > shortest_distances[node] + weight
-					shortest_distances[w] = shortest_distances[node] + weight
-					previous[w] = node
-					pq.push(w)
+		
+				
+				if visited[w]==false
+					
+					weight = calcweight.call(node,w)
+					
+					
+					if shortest_distances[w] >= shortest_distances[node] + weight
+						shortest_distances[w] = shortest_distances[node] + weight
+						previous[w] = node
+						pq.push(w)
+					end
 				end
 			end
 		#end
 		node = pq.pop
 	end
-	return [shortest_distances, previous]
+	
+	ret = [destination]
+	i = 1
+	while destination != source
+		destination = previous[destination]
+		ret[i] = destination
+		i+=1
+	end
+	return ret.reverse
 end
 
+def find_shortest(rootCode,goalCode)
+	self.findHops(rootCode, goalCode, lambda{|x,y|  1})
+end
 
+def find_cheapest(rootCode,goalCode)
+#findHops(rootCode, goalCode,Proc.new{|x,y|  1})
+end
 
 
 
 end
 ds = MultiDijkstraHop.new
-ds.findHops(:VIE,:AUK)
+l=ds.find_shortest('VIE','LAX')
+p l
 
