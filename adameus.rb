@@ -156,24 +156,27 @@ end
 
 end
 
+def method_missing(m, *args, &block)  
+  puts "There's no Query called #{m} here -- please try again."  
+end  
 
 
 def repl
-adameus = Adameus.new
-while true do
-      puts 'Enter Query'
-      entry = gets.chomp
-      if(entry == "exit")
-        break
-      else
-        response = adameus.send(*entry.split(/\s+/)) 
-        if(response.nil?)
-          puts 'Response Empty'
+  adameus = Adameus.new
+  while true do
+        puts 'Enter Query'
+        entry = gets.chomp
+        if(entry == "exit")
+          break
         else
-          puts 'Response:'
-          puts response
+          response = adameus.send(*entry.split(/\s+/)) 
+          if(response.nil?)
+            puts 'Response Empty'
+          else
+            puts 'Response:'
+            puts response
+          end
         end
-      end
+  end
 end
-end
-#repl
+repl

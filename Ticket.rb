@@ -2,10 +2,29 @@ require_relative 'Flight'
 require_relative 'adameus'
 
 class GroupTicket
-  def initialize(flights, seatclass, gender, firstname, surname, nbOfTickets)
+  attr_reader :Customers
+  attr_reader :nbOfTickers
+  def initialize(flights, seatclass, nbOfTickets)
     #might be better to wait this one out until I have a better idea of 
     #what they're actually lookin for.
+    @Customers = []
+    @nbOfTickers = nbOfTickers
   end
+  
+  def addCustomer(customer)
+    if( @Customers.length < @nbOfTickers ) then
+      @Customers.append(customer)
+    else
+      puts("GroupTicket has reached its maximum customers")
+    end
+  end
+  
+  def to_s
+    @Customers.each do |cust|
+      cust.to_s
+    end
+  end
+  
 end
 
 # A Compound ticket represents a ticket for a sequence of flights.
