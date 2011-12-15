@@ -159,11 +159,6 @@ end
 
 end
 
-# def method_missing(m, *args, &block)  
-#  puts "There's no Query called #{m} here -- please try again."  
-# end  
-
-
 def repl
   adameus = Adameus.new
   while true do
