@@ -1,8 +1,9 @@
+require './Airport'
 require './pqueue'
 require './adameus'
-require './Airport'
 require './Date'
 require './Flight'
+
 class MultiDijkstraHop
 #Don't worry, the name of the class will change;)
 #This class provides the functionality find connected flights
@@ -85,7 +86,7 @@ def getFlights(source,dest,dat)
 		if c.nil? then c="" end
 		
 		td = Date.new(dat.to_s,dat.time_to_s)
-		td = td.addTimeToDate('05:00')
+		td = td.addTimeToDate('06:00')
 		
 		if(!dat.isSameDay(td)) then
 		t = @ad.connections(source,dest,dat)
@@ -176,7 +177,10 @@ def dijkstra(source, destination, calcweight)
 	i = 0
 	
 	while destination != source
-		
+		if destination.nil? then 
+		p "No flights available, try an other day..."
+		return nil
+		end
 		f = previous[destination][1]
 
 		ret[i] = f
@@ -199,21 +203,14 @@ def find_shortest_time(rootCode,goalCode)
 	self.findHops(rootCode, goalCode, lambda{|x,t|  (Date.new(x.date.to_s, x.departureTime.to_s).addTimeToDate(x.flightDuration)).to_i})
 end
 
+def find_expensive(rootCode,goalCode)
+findHops(rootCode, goalCode,lambda{|x,t|  t-((x.price(@pc).to_i))})
+end
 
 end
-p 'FIND SHORTEST CDG->BKK'
-ds = MultiDijkstraHop.new(Date.new("2011-12-25","06:00"),'B',5)
-l=ds.find_shortest('CDG','LAX')
-p l[0].departure
-l.each do |a|
-p "departure " + a.date.to_s + '   ' +a.departureTime.to_s
-p "duration "+ a.flightDuration.to_s
-p "price "+ a.price('E')
-p a.destination
 
-end
-p 'FIND MOST QUICK CDG->CDG'
-l=ds.find_shortest_time('CDG','LAX')
+def printthis(l)
+if not l.nil? then
 p l[0].departure
 l.each do |a|
 p "departure " + a.date.to_s + '   ' +a.departureTime.to_s
@@ -221,14 +218,27 @@ p "duration "+ a.flightDuration.to_s
 p a.destination
 p "price "+ a.price('E')
 end
-
-p 'FIND CHEAPEST CDG->BKK'
-l=ds.find_cheapest('CDG','LAX')
-p l[0].departure
-l.each do |a|
-p "departure " + a.date.to_s + '   ' +a.departureTime.to_s
-p "duration "+ a.flightDuration.to_s
-p a.destination
-p "price "+ a.price('E')
 end
+end
+
+
+start = 'AMS'
+dest = 'BCN'
+p 'FIND SHORTEST '+start+'->'+dest
+ds = MultiDijkstraHop.new(Date.new("2011-12-10","06:00"),'B',5)
+l=ds.find_shortest(start,dest)
+printthis(l)
+
+p 'FIND MOST QUICK '+start+'->'+dest
+l=ds.find_shortest_time(start,dest)
+printthis(l)
+
+p 'FIND CHEAPEST '+start+'->'+dest
+l=ds.find_cheapest(start,dest)
+printthis(l)
+
+p 'FIND MOST EXPENSIVE '+start+'->'+dest
+l=ds.find_expensive(start,dest)
+printthis(l)
+
 

@@ -150,15 +150,15 @@ def l
   MultiHop.new.findHops('PEK', 'AKL')
 end
 
+def method_missing(m, *args, &block)  
+  puts "There's no Query called #{m} here -- please try again."  
+end 
   alias :execute :instance_eval
   
   private :open_host, :close_host, :query_host
 
 end
-
-def method_missing(m, *args, &block)  
-  puts "There's no Query called #{m} here -- please try again."  
-end  
+ 
 
 
 def repl
@@ -179,4 +179,4 @@ def repl
         end
   end
 end
-repl
+#repl
