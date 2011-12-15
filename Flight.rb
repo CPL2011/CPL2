@@ -1,3 +1,4 @@
+
 require_relative 'Airport'
 require_relative 'Date'
 require_relative 'adameus'
@@ -7,7 +8,11 @@ class Flight
 
   def initialize(connCode, date)
     @flightCode = connCode[0,6]
-    @date = Date.new(date, nil)
+    if (date.class.to_s.eql?("Date"))
+        @date = date
+    else
+        @date = Date.new(date, nil)
+    end
     @departureTime = MyTime.new(connCode[6,5])
     @flightDuration = MyTime.new(connCode[11,5])
     @departureAirport = nil
