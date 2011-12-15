@@ -30,6 +30,11 @@ class Date
     return @date + time.seconds
   end
 
+
+
+  def isSameDay(givenDate) 
+    return to_s.eql?(givenDate.to_s)
+  end
   # Compares the date represented by 'this' with the date 
   # specified by the parameters
   # givenDate : a string following the previously specified syntax for dates, 
@@ -81,7 +86,7 @@ end
 
 #-SOME-TESTS--------------------------------------------------------------------
 test1 = Date.new("2011-03-12", "10:30")
-#test2 = Date.new("2011-03-12", nil)
+test2 = Date.new("2011-03-11", nil)
 #puts test1.date
 #puts test2.date
 ##puts test1.addTimeToDate("17:55")
@@ -91,6 +96,7 @@ test1 = Date.new("2011-03-12", "10:30")
 #puts test2.compare(test1, nil)
 #puts timeToAdd
 #puts test1
+puts test1.isSameDay(test2)
 puts test1.time_to_s
 puts test1.to_s
 #-------------------------------------------------------------------------------
