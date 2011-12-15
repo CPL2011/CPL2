@@ -72,27 +72,30 @@ def loadAirport(airport,destinations)
  # If the time is after 18:00, flights from the next day will be included in the search ---->this needs to be done right!!
 def getFlights(source,dest,dat)
 	ret = []
-	c = ''
+	
 	#if c.nil? then 
 	#	dat = Date.new( (dat.addTimeToDate('24:00')).to_s ,nil)    	# TODO change the date to the next day to get other flights
 	#	c = @ad.connections(source,dest,dat)
 	#	if c.nil? then return nil end
 	#end
+
 	
-	i=0
-	while i<1 do #add 6 hs to the time --
+		c = @ad.connections(source,dest,dat)
+		if c.nil? then c="" end
+		
+		td = Date.new(dat.to_s,dat.time_to_s)
+		td = td.addTimeToDate('05:00')
+		if(!dat.isSameDay(td)) then
 		t = @ad.connections(source,dest,dat)
-		i=i+1
-		dat = Date.new( (dat.addTimeToDate('4:00')).to_s ,nil)
+		if not t.nil? then c = c + t end 
+		end
 		
-		
-		if not t.nil? then c=c+t end
-	end
+	
 	if c.nil? then return nil end
 	c.split(/\n/).each do |conn|
 		f = Flight.new(c,dat.to_s)
 		f.price(@pc)
-		if (f.seats.to_i>=@seats) and (dat.compare(dat.to_s,f.departureTime.to_s)==-1) then ret.push f end
+		if (f.seats.to_i>=@seats) and (dat.compare(td.to_s,f.departureTime.to_s)==-1) then ret.push f end
 	end
 	return ret
 end
