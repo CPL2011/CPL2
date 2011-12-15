@@ -79,6 +79,18 @@ class Adameus
     query_host("S" + date.to_s + flightnumber.to_s + seatclass.to_s)
   end
   
+  def holdCheapest
+
+  end
+
+  def holdLeastHops
+
+  end
+
+  def holdQuickest
+
+  end
+
   def hold(date, flightnumber, seatclass, gender, firstname, surname)
     firstname = firstname.to_s
     surname = surname.to_s
@@ -99,6 +111,8 @@ class Adameus
       end
     end
   end
+
+  
   
   def cancel(bookingcode)
     query_host("X" + bookingcode.to_s)
