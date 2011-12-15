@@ -17,7 +17,7 @@ class Flight
     @flightDuration = MyTime.new(connCode[11,5])
     @departureAirport = nil
     @destinationAirport = nil
-    @adameus = Adameus.new 
+    #@adameus = Adameus.new 
     @seats = 0
     @price = nil
   end
@@ -28,7 +28,7 @@ class Flight
   # this flight is requested a new database call is made.
   # NOTE TO SELF: curiously enough the call to .to_s for date is not required 
   def price(seatClass)
-    seatInfo = adameus.seats(date, flightCode, seatClass).chomp
+    seatInfo = $adameus.seats(date, flightCode, seatClass).chomp
     #puts seatInfo
     if (seatInfo.size != 8) then return nil end 
     @seats = seatInfo[0,3]
@@ -55,7 +55,7 @@ class Flight
   
   # The database is queried for the airports associated with this direct flight
   def setAirports 
-    airportCodes = adameus.flight_airports(flightCode)
+    airportCodes = $adameus.flight_airports(flightCode)
     @departureAirport = Airport.new(airportCodes[0,3])
     @destinationAirport = Airport.new(airportCodes[3,3])
   end
