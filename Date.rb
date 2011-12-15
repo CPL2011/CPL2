@@ -41,7 +41,9 @@ class Date
       return date <=> Date.new(givenDate, givenTime).date
     end
   end
-
+  def time_to_s
+    return date.to_s.split(/ /)[1]
+  end
   def to_s
     return date.to_s.split(/ /)[0]
   end
@@ -69,15 +71,15 @@ class MyTime
 end
 
 #-SOME-TESTS--------------------------------------------------------------------
-test1 = Date.new("2011-03-12", "10:30")
-test2 = Date.new("2011-03-12", nil)
-puts test1.date
-puts test2.date
-puts test1.addTimeToDate("17:55")
-timeToAdd = MyTime.new("17:55")
-puts test1.addTimeToDate(timeToAdd)
-puts test1.compare("2011-03-12", "10:29")
-puts test2.compare(test1, nil)
-puts timeToAdd
-puts test1
+#test1 = Date.new("2011-03-12", "10:30")
+#test2 = Date.new("2011-03-12", nil)
+#puts test1.date
+#puts test2.date
+##puts test1.addTimeToDate("17:55")
+#timeToAdd = MyTime.new("17:55")
+##puts test1.addTimeToDate(timeToAdd)
+#puts test1.compare("2011-03-12", "10:29")
+#puts test2.compare(test1, nil)
+#puts timeToAdd
+#puts test1
 #-------------------------------------------------------------------------------
