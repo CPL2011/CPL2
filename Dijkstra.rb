@@ -25,10 +25,11 @@ end
   end
   
   def findHops(rootCode, goalCode, proc)
-	if not @loaded
+	if not @loaded then 
 		self.loadGraph
 		@loaded = true
-    end
+	end 
+	
     root = findAirport(rootCode)
     goal = findAirport(goalCode)
     return dijkstra(root,goal,proc)
@@ -56,15 +57,25 @@ def loadAirport(airport,destinations)
         end
       end
   end 
+  
 def getFlights(source,dest,dat)
 	ret = []
-	c = @ad.connections(source,dest,dat)
-	if c.nil? then 
-		#dat = Date.new( (dat.to_s).to_i +1,nil)    	# TODO change the date to the next day to get other flights
-		#c = @ad.connections(source,dest,dat)
-		if c.nil? then return nil end
+	c = ''
+	#if c.nil? then 
+	#	dat = Date.new( (dat.addTimeToDate('24:00')).to_s ,nil)    	# TODO change the date to the next day to get other flights
+	#	c = @ad.connections(source,dest,dat)
+	#	if c.nil? then return nil end
+	#end
+	i=0
+	while i<1 do #add 12 hs to the time --
+		t = @ad.connections(source,dest,dat)
+		i=i+1
+		dat = Date.new( (dat.addTimeToDate('12:00')).to_s ,nil)
+		
+		
+		if not t.nil? then c=c+t end
 	end
-
+	if c.nil? then return nil end
 	c.split(/\n/).each do |conn|
 		f = Flight.new(c,dat.to_s)
 		f.price(@pc)
@@ -92,11 +103,12 @@ def dijkstra(source, destination, calcweight)
 	node = pq.pop
 	
 	
-	while not node.nil?#while node != destination and not node.nil?
+	while not node.nil?
 		
 		visited[node[0]] = true
 		
 		#if edges[v]
+		
 			node[0].connections.each do  |w|
 			
 				if visited[w]==false
@@ -129,6 +141,7 @@ def dijkstra(source, destination, calcweight)
 							arrdate = Date.new(flight.date.to_s,flight.departureTime.to_s)
 							arrdate.addTimeToDate(flight.flightDuration)
 							pq.push([w,arrdate])
+							
 						end
 					end
 				#end
@@ -163,14 +176,14 @@ def find_cheapest(rootCode,goalCode)
 findHops(rootCode, goalCode,lambda{|x,t|  t+(x.price(@pc).to_i)})
 end
 def find_shortest_time(rootCode,goalCode)
-	self.findHops(rootCode, goalCode, lambda{|x,t|  t+(Date.new(x.date.to_s, x.departureTime.to_s).addTimeToDate(x.flightDuration)).to_i})
+	self.findHops(rootCode, goalCode, lambda{|x,t|  (Date.new(x.date.to_s, x.departureTime.to_s).addTimeToDate(x.flightDuration)).to_i})
 end
 
 
 end
-p 'FIND SHORTEST CPT->BKK'
+p 'FIND SHORTEST CDG->BKK'
 ds = MultiDijkstraHop.new(Date.new("2011-12-25","06:00"),'B')
-l=ds.find_shortest('CPT','BKK')
+l=ds.find_shortest('CDG','LAX')
 p l[0].departure
 l.each do |a|
 p "departure " + a.date.to_s + '   ' +a.departureTime.to_s
@@ -179,8 +192,8 @@ p "price "+ a.price('E')
 p a.destination
 
 end
-p 'FIND CHEAPEST CPT->BKK'
-l=ds.find_cheapest('CPT','BKK')
+p 'FIND MOST QUICK CDG->CDG'
+l=ds.find_shortest_time('CDG','LAX')
 p l[0].departure
 l.each do |a|
 p "departure " + a.date.to_s + '   ' +a.departureTime.to_s
@@ -188,9 +201,9 @@ p "duration "+ a.flightDuration.to_s
 p a.destination
 p "price "+ a.price('E')
 end
-p 'FIND MOST QUICK CPT->BKK'
 
-l=ds.find_shortest_time('CPT','BKK')
+p 'FIND CHEAPEST CDG->BKK'
+l=ds.find_cheapest('CDG','LAX')
 p l[0].departure
 l.each do |a|
 p "departure " + a.date.to_s + '   ' +a.departureTime.to_s
