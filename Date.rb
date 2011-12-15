@@ -27,7 +27,7 @@ class Date
     if (!time.class.to_s.eql?("MyTime"))
       time = MyTime.new(time)
     end
-    return @date + time.seconds
+    @date += time.seconds
   end
 
 

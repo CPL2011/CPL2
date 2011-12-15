@@ -1,8 +1,9 @@
+require './Airport'
 require './pqueue'
 require './adameus'
-require './Airport'
 require './Date'
 require './Flight'
+
 class MultiDijkstraHop
 #Don't worry, the name of the class will change;)
 #This class provides the functionality find connected flights
@@ -14,9 +15,9 @@ def initialize(date,priceClass,seats)
 @airports = []
 @INFINITY = 1 << 64
 @loaded = false
-@maxdays = 3
 @ad = Adameus.new
 @pc = priceClass
+
 end
 #returns an airport object corresponding to the code
   def findAirport(startCode)
@@ -48,10 +49,9 @@ end
 #loads the graph, finds the airport and stores the connections  
   def loadGraph 
     
-    @airports = []
-    @ad.airports.split(/\n/).each do |airport|
-      a = Airport.new(airport[0,3])
-      @airports.push(a)
+    @airports = 
+    @ad.airports.split(/\n/).map do |airport|
+       Airport.new(airport[0,3])
     end
     @airports.each do |airport|
     loadAirport(airport,@ad.destinations(airport.code))
@@ -68,6 +68,8 @@ def loadAirport(airport,destinations)
         end
       end
   end 
+  
+ 
  #returns all the flights from source to dest, given the date: dat.
  # If the time is after 18:00, flights from the next day will be included in the search ---->this needs to be done right!!
 def getFlights(source,dest,dat)
@@ -84,7 +86,8 @@ def getFlights(source,dest,dat)
 		if c.nil? then c="" end
 		
 		td = Date.new(dat.to_s,dat.time_to_s)
-		td = td.addTimeToDate('05:00')
+		td = td.addTimeToDate('06:00')
+		
 		if(!dat.isSameDay(td)) then
 		t = @ad.connections(source,dest,dat)
 		if not t.nil? then c = c + t end 
@@ -93,9 +96,9 @@ def getFlights(source,dest,dat)
 	
 	if c.nil? then return nil end
 	c.split(/\n/).each do |conn|
-		f = Flight.new(c,dat.to_s)
+		f = Flight.new(c,td.to_s)
 		f.price(@pc)
-		if (f.seats.to_i>=@seats) and (dat.compare(td.to_s,f.departureTime.to_s)==-1) then ret.push f end
+		if (f.seats.to_i>=@seats) and (dat.compare(dat.to_s,f.departureTime.to_s)==-1) then ret.push f end
 	end
 	return ret
 end
@@ -174,7 +177,10 @@ def dijkstra(source, destination, calcweight)
 	i = 0
 	
 	while destination != source
-		
+		if destination.nil? then 
+		p "No flights available, try an other day..."
+		return nil
+		end
 		f = previous[destination][1]
 
 		ret[i] = f
@@ -197,21 +203,14 @@ def find_shortest_time(rootCode,goalCode)
 	self.findHops(rootCode, goalCode, lambda{|x,t|  (Date.new(x.date.to_s, x.departureTime.to_s).addTimeToDate(x.flightDuration)).to_i})
 end
 
+def find_expensive(rootCode,goalCode)
+findHops(rootCode, goalCode,lambda{|x,t|  t-((x.price(@pc).to_i))})
+end
 
 end
-p 'FIND SHORTEST CDG->BKK'
-ds = MultiDijkstraHop.new(Date.new("2011-12-25","06:00"),'B',5)
-l=ds.find_shortest('CDG','LAX')
-p l[0].departure
-l.each do |a|
-p "departure " + a.date.to_s + '   ' +a.departureTime.to_s
-p "duration "+ a.flightDuration.to_s
-p "price "+ a.price('E')
-p a.destination
 
-end
-p 'FIND MOST QUICK CDG->CDG'
-l=ds.find_shortest_time('CDG','LAX')
+def printthis(l)
+if not l.nil? then
 p l[0].departure
 l.each do |a|
 p "departure " + a.date.to_s + '   ' +a.departureTime.to_s
@@ -219,14 +218,27 @@ p "duration "+ a.flightDuration.to_s
 p a.destination
 p "price "+ a.price('E')
 end
-
-p 'FIND CHEAPEST CDG->BKK'
-l=ds.find_cheapest('CDG','LAX')
-p l[0].departure
-l.each do |a|
-p "departure " + a.date.to_s + '   ' +a.departureTime.to_s
-p "duration "+ a.flightDuration.to_s
-p a.destination
-p "price "+ a.price('E')
 end
+end
+
+
+start = 'AMS'
+dest = 'BCN'
+p 'FIND SHORTEST '+start+'->'+dest
+ds = MultiDijkstraHop.new(Date.new("2011-12-10","06:00"),'B',5)
+l=ds.find_shortest(start,dest)
+printthis(l)
+
+p 'FIND MOST QUICK '+start+'->'+dest
+l=ds.find_shortest_time(start,dest)
+printthis(l)
+
+p 'FIND CHEAPEST '+start+'->'+dest
+l=ds.find_cheapest(start,dest)
+printthis(l)
+
+p 'FIND MOST EXPENSIVE '+start+'->'+dest
+l=ds.find_expensive(start,dest)
+printthis(l)
+
 
