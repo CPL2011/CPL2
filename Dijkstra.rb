@@ -6,8 +6,7 @@ require './Flight'
 class MultiDijkstraHop
 
 def initialize(date,priceClass)
-@depdate = date
-@date = Date.new(date,'00:01')
+@date = date
 @airports = []
 @INFINITY = 1 << 32
 @loaded = false
@@ -58,7 +57,7 @@ def loadAirport(airport,destinations)
       end
   end 
 def getFlight(source,dest)
-	c = @ad.connections(source,dest,@depdate)
+	c = @ad.connections(source,dest,@date)
 	if c.nil? then return nil
 	else
 	f = Flight.new(c,@date)
@@ -70,9 +69,9 @@ def getFlight(source,dest)
 end
 	
 def dijkstra(source, destination, calcweight)
-	visited = Hash.new
-	shortest_distances = Hash.new
-	previous = Hash.new
+	visited = Hash.new				#hash of airports and booleans
+	shortest_distances = Hash.new	#hash of airports and their distance to the source
+	previous = Hash.new				#hash of airports and their predecessor in the dijkstra algorithm -- the values are tuples of airports and flights
 	@airports.each do |a|
 		visited[a] = false
 		shortest_distances[a]=@INFINITY
@@ -80,9 +79,9 @@ def dijkstra(source, destination, calcweight)
 	end
 	
 	
-	pq = PQueue.new(proc {|x,y| shortest_distances[x] < shortest_distances[y]})
+	pq = PQueue.new(proc {|x,y| shortest_distances[x[0]] < shortest_distances[y[0]]})
 	
-	pq.push(source)
+	pq.push([source,nil]) 		#the priority queue contains a tuple of airports and the arrival time in that airport
 	visited[source] = true
 	shortest_distances[source] = 0
 	node = pq.pop
@@ -90,25 +89,26 @@ def dijkstra(source, destination, calcweight)
 	
 	while node != destination and not node.nil?
 		
-		visited[node] = true
+		visited[node[0]] = true
 		
 		#if edges[v]
-			node.connections.each do  |w|
-		
-				
+			node[0].connections.each do  |w|
+			
 				if visited[w]==false
-					f = getFlight(node,w)
 					
-					if not f.nil? then
+					
+					f = getFlight(node[0],w)
+					#t = f.departureTime
+					if not f.nil? then #and (node[1].compare(t.to_s,t.getTime)<0)
 					
 					weight = calcweight.call(f)
 					
 					
-					if shortest_distances[w] >= shortest_distances[node] + weight
-						shortest_distances[w] = shortest_distances[node] + weight
-						previous[w] = [node,f]
-					
-						pq.push(w)
+					if shortest_distances[w] >= shortest_distances[node[0]] + weight
+						shortest_distances[w] = shortest_distances[node[0]] + weight
+						previous[w] = [node[0],f]
+						
+						pq.push([w,nil])
 					end
 					end
 				end
@@ -143,8 +143,8 @@ end
 
 
 end
-ds = MultiDijkstraHop.new("2011-12-12",'E')
 
+ds = MultiDijkstraHop.new(Date.new("2011-12-12","06:00"),'E')
 l=ds.find_shortest('VIE','LAX')
 p l[0].departure
 l.each do |a|
