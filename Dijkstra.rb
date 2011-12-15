@@ -96,7 +96,7 @@ def getFlights(source,dest,dat)
 	
 	if c.nil? then return nil end
 	c.split(/\n/).each do |conn|
-		f = Flight.new(c,td.to_s)
+		f = Flight.new(conn,td.to_s)
 		f.price(@pc)
 		if (f.seats.to_i>=@seats) and (dat.compare(dat.to_s,f.departureTime.to_s)==-1) then ret.push f end
 	end
