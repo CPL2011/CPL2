@@ -20,6 +20,6 @@ class Airport
   end
   
   def to_s
-    return @code
+    return @code.to_s
   end
 end
