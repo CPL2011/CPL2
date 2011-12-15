@@ -1,10 +1,10 @@
 
-require_relative 'Airport'
+#require_relative 'Airport'
 require_relative 'Date'
 require_relative 'adameus'
 # The Flight class represents a single, direct flight between two airports
 class Flight
-  attr_reader :flightCode, :date, :adameus, :departureTime, :flightDuration, :departureAirport, :destinationAirport, :seats
+  attr_reader :flightCode,:price, :date, :adameus, :departureTime, :flightDuration, :departureAirport, :destinationAirport, :seats
 
   def initialize(connCode, date)
     @flightCode = connCode[0,6]
@@ -19,6 +19,7 @@ class Flight
     @destinationAirport = nil
     @adameus = Adameus.new 
     @seats = 0
+    @price = nil
   end
 
   # Returns the cost of a seat on this flight if there is still room for another
@@ -31,9 +32,10 @@ class Flight
     #puts seatInfo
     if (seatInfo.size != 8) then return nil end 
     @seats = seatInfo[0,3]
-    seatCost = seatInfo[3,5]
+    @price = seatInfo[3,5]
+    
     if (@seats.to_i < 1) then return nil
-    else return seatCost
+    else return @price
     end
   end
 

@@ -2,29 +2,50 @@ require_relative 'Flight'
 require_relative 'adameus'
 
 class GroupTicket
-  attr_reader :Customers
-  attr_reader :nbOfTickers
-  def initialize(flights, seatclass, nbOfTickets)
+  attr_reader :tickets, :flights, :seatclass
+  def initialize(flights, seatclass)
     #might be better to wait this one out until I have a better idea of 
     #what they're actually lookin for.
-    @Customers = []
-    @nbOfTickers = nbOfTickers
+    @tickets = []
+    @flights = flights
+    @seatclass = seatclass
   end
   
-  def addCustomer(customer)
-    if( @Customers.length < @nbOfTickers ) then
-      @Customers.append(customer)
-    else
-      puts("GroupTicket has reached its maximum customers")
-    end
+  def addTicket(gender, firstname, surname)
+    t = CompoundTicket.new(flights, seatclass, gender, firstname, surname)
+    tickets.push(t)
   end
   
   def to_s
-    @Customers.each do |cust|
-      cust.to_s
+    tickets_s = tickets.map do |ticket|
+      ticket.to_s
+    end
+    return tickets_s
+  end
+  
+  def hold
+    tickets.each do |ticket| 
+      ticket.hold
+    end
+  end
+
+  def book
+    tickets.each do |ticket|
+      ticket.book
+    end
+  end
+
+  def cancel
+    tickets.each do |ticket|
+      ticket.cancel
     end
   end
   
+  def status
+    tickets.each do |ticket|
+      ticket.status
+    end
+  end  
 end
 
 # A Compound ticket represents a ticket for a sequence of flights.
@@ -41,9 +62,9 @@ class CompoundTicket
     # Before printing a check should be done to ensure the booking is entirely valid.
     # If not this message should mention it's invalid. if it is the subsequent string should be printed
     flights = @compoundTicket.inject("") do |acc, ticket|
-      acc + ticket.flight.departure + "=>" 
+      acc + ticket.flight.departure.to_s + "=>"
     end
-    flightString = flights + compoundTicket.last.flight.destination    
+    flightString = flights + compoundTicket.last.flight.destination.to_s
     if (compoundTicket.last.gender.eql?("M")) then 
       title = "Mr." 
     else title = "Mrs." end
@@ -143,9 +164,13 @@ conns = adameus.connections('VIE', 'BRU', date).split(/\n/)
 conns2 = adameus.connections('BRU', 'FRA', date).split(/\n/)
 myFlight1 = Flight.new(conns[0], date)
 myFlight2 = Flight.new(conns2[0], date)
-myCompoundTicket = CompoundTicket.new([myFlight1, myFlight2], 'E', 'M', 'Edsger', 'Dijkstra')
-puts myCompoundTicket.hold
-puts myCompoundTicket.to_s
+groupT = GroupTicket.new([myFlight1, myFlight2], 'E')
+groupT.addTicket('M', 'Edsger','Dijkstra')
+groupT.addTicket('F', 'Maria','Dijkstra')
+puts groupT.to_s
+# myCompoundTicket = CompoundTicket.new([myFlight1, myFlight2], 'E', 'M', 'Edsger', 'Dijkstra')
+# puts myCompoundTicket.hold
+# puts myCompoundTicket.to_s
 # myFlight = Flight.new(conns[0], date)
 # puts myFlight.price('F')
 # puts myFlight.departure

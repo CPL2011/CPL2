@@ -197,7 +197,9 @@ def find_shortest(rootCode,goalCode)
 end
 
 def find_cheapest(rootCode,goalCode)
-findHops(rootCode, goalCode,lambda{|x,t|  t+(x.price(@pc).to_i)})
+findHops(rootCode, goalCode,lambda{|x,t| 
+ 
+t+(x.price(@pc).to_i)})
 end
 def find_shortest_time(rootCode,goalCode)
 	self.findHops(rootCode, goalCode, lambda{|x,t|  (Date.new(x.date.to_s, x.departureTime.to_s).addTimeToDate(x.flightDuration)).to_i})

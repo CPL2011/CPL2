@@ -85,8 +85,8 @@ class MyTime
 end
 
 #-SOME-TESTS--------------------------------------------------------------------
-test1 = Date.new("2011-03-12", "10:30")
-test2 = Date.new("2011-03-11", nil)
+#test1 = Date.new("2011-03-12", "10:30")
+#test2 = Date.new("2011-03-11", nil)
 #puts test1.date
 #puts test2.date
 ##puts test1.addTimeToDate("17:55")
@@ -96,7 +96,7 @@ test2 = Date.new("2011-03-11", nil)
 #puts test2.compare(test1, nil)
 #puts timeToAdd
 #puts test1
-puts test1.isSameDay(test2)
-puts test1.time_to_s
-puts test1.to_s
+#puts test1.isSameDay(test2)
+#puts test1.time_to_s
+#puts test1.to_s
 #-------------------------------------------------------------------------------

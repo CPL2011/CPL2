@@ -172,8 +172,6 @@ end
   private :open_host, :close_host, :query_host
 
 end
- 
-
 
 def repl
   adameus = Adameus.new
@@ -193,4 +191,5 @@ def repl
         end
   end
 end
-#repl
+
+# repl
