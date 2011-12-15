@@ -5,7 +5,8 @@ require './Date'
 require './Flight'
 class MultiDijkstraHop
 
-def initialize(date,priceClass)
+def initialize(date,priceClass,seats)
+@seats = seats
 @date = date
 @airports = []
 @INFINITY = 1 << 64
@@ -79,7 +80,7 @@ def getFlights(source,dest,dat)
 	c.split(/\n/).each do |conn|
 		f = Flight.new(c,dat.to_s)
 		f.price(@pc)
-		if (f.seats!=0) and (dat.compare(dat.to_s,f.departureTime.to_s)==-1) then ret.push f end
+		if (f.seats.to_i>=@seats) and (dat.compare(dat.to_s,f.departureTime.to_s)==-1) then ret.push f end
 	end
 	return ret
 end
@@ -182,7 +183,7 @@ end
 
 end
 p 'FIND SHORTEST CDG->BKK'
-ds = MultiDijkstraHop.new(Date.new("2011-12-25","06:00"),'B')
+ds = MultiDijkstraHop.new(Date.new("2011-12-25","06:00"),'B',5)
 l=ds.find_shortest('CDG','LAX')
 p l[0].departure
 l.each do |a|
