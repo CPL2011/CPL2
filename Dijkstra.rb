@@ -14,9 +14,9 @@ def initialize(date,priceClass,seats)
 @airports = []
 @INFINITY = 1 << 64
 @loaded = false
-@maxdays = 3
 @ad = Adameus.new
 @pc = priceClass
+
 end
 #returns an airport object corresponding to the code
   def findAirport(startCode)
@@ -48,10 +48,9 @@ end
 #loads the graph, finds the airport and stores the connections  
   def loadGraph 
     
-    @airports = []
-    @ad.airports.split(/\n/).each do |airport|
-      a = Airport.new(airport[0,3])
-      @airports.push(a)
+    @airports = 
+    @ad.airports.split(/\n/).map do |airport|
+       Airport.new(airport[0,3])
     end
     @airports.each do |airport|
     loadAirport(airport,@ad.destinations(airport.code))
@@ -68,6 +67,8 @@ def loadAirport(airport,destinations)
         end
       end
   end 
+  
+ 
  #returns all the flights from source to dest, given the date: dat.
  # If the time is after 18:00, flights from the next day will be included in the search ---->this needs to be done right!!
 def getFlights(source,dest,dat)
@@ -85,6 +86,7 @@ def getFlights(source,dest,dat)
 		
 		td = Date.new(dat.to_s,dat.time_to_s)
 		td = td.addTimeToDate('05:00')
+		
 		if(!dat.isSameDay(td)) then
 		t = @ad.connections(source,dest,dat)
 		if not t.nil? then c = c + t end 
@@ -93,9 +95,9 @@ def getFlights(source,dest,dat)
 	
 	if c.nil? then return nil end
 	c.split(/\n/).each do |conn|
-		f = Flight.new(c,dat.to_s)
+		f = Flight.new(c,td.to_s)
 		f.price(@pc)
-		if (f.seats.to_i>=@seats) and (dat.compare(td.to_s,f.departureTime.to_s)==-1) then ret.push f end
+		if (f.seats.to_i>=@seats) and (dat.compare(dat.to_s,f.departureTime.to_s)==-1) then ret.push f end
 	end
 	return ret
 end
