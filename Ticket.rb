@@ -11,13 +11,16 @@ end
 # A Compound ticket represents a ticket for a sequence of flights.
 class CompoundTicket
   attr_reader :compoundTicket
-  def initialize(flights, seatclass, gender, firstname, surname)
+    def initialize(flights, seatclass, gender, firstname, surname)
     @compoundTicket = flights.map do |flight|
       Ticket.new(flight, seatclass, gender, firstname, surname)
     end
   end
   
   def to_s
+
+    # Before printing a check should be done to ensure the booking is entirely valid.
+    # If not this message should mention it's invalid. if it is the subsequent string should be printed
     flights = @compoundTicket.inject("") do |acc, ticket|
       acc + ticket.flight.departure + "=>" 
     end
@@ -31,8 +34,7 @@ class CompoundTicket
     elsif (compoundTicket.last.seatclass.eql?("B")) then 
       seatclass = "Business class" 
     else seatclass = "First class" end
-    price = compoundTicket.inject(0) do |acc, ticket| #PRICE CAN'T HANDLE SITUATION YET WITH ZERO CHAIRS, PROBABLY SHOULDN'T
-      #BE CALLED IN THAT CASE OR SOME OTHER TECHNIQUE SHOULD BE USED
+    price = compoundTicket.inject(0) do |acc, ticket| 
       acc + ticket.flight.price(ticket.seatclass).to_i
     end
     ticketOpening = "-----------TICKET-------------\n"
