@@ -125,7 +125,7 @@ class Ticket
     @gender = gender
     @firstname = firstname
     @surname = surname
-    @booking = Struct::Booking.new(nil, nil)
+    @booking = Struct::Booking.new(nil, nil, nil)
     @adameus = adameus = Adameus.new 
   end
 
@@ -134,6 +134,9 @@ class Ticket
     if (feedback.size == 33) 
       @booking[:bookingCode] = feedback[1,32]
       @booking[:timeStamp] = Time.now
+      b = adameus.query_booking(@booking.bookingCode)
+      @booking[:price] = b[64,69]
+      puts @booking.price
     end
   end
 
@@ -148,25 +151,22 @@ class Ticket
       adameus.cancel(booking.bookingCode)
     end
   end
-  
-  def status
-    raise "No holding/booking made" if booking.bookingCode.nil?
-    adameus.query_booking(booking.bookingCode)    
-  end
 end
 
-Struct.new("Booking", :bookingCode, :timeStamp)
+Struct.new("Booking", :bookingCode, :timeStamp, :price)
 
 #-SOME-TESTS--------------------------------------------------------------------
 date = '2012-01-15'
 adameus = Adameus.new
-conns = adameus.connections('VIE', 'BRU', date).split(/\n/)
-conns2 = adameus.connections('BRU', 'FRA', date).split(/\n/)
+conns = adameus.connections('FRA', 'BRU', date).split(/\n/)
+conns2 = adameus.connections('BRU', 'VIE', date).split(/\n/)
 myFlight1 = Flight.new(conns[0], date)
 myFlight2 = Flight.new(conns2[0], date)
 groupT = GroupTicket.new([myFlight1, myFlight2], 'E')
 groupT.addTicket('M', 'Edsger','Dijkstra')
 groupT.addTicket('F', 'Maria','Dijkstra')
+puts groupT.to_s
+groupT.hold
 puts groupT.to_s
 # myCompoundTicket = CompoundTicket.new([myFlight1, myFlight2], 'E', 'M', 'Edsger', 'Dijkstra')
 # puts myCompoundTicket.hold
