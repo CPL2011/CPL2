@@ -41,7 +41,6 @@ class Flight
   # are not supposed to change, these are at most requested once from the database.
   def departure
     if (departureAirport.nil?) then setAirports end
-    puts (@departureAirport)
     return @departureAirport
   end
 
