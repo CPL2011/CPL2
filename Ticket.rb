@@ -165,9 +165,8 @@ conns2 = adameus.connections('BRU', 'FRA', date).split(/\n/)
 myFlight1 = Flight.new(conns[0], date)
 myFlight2 = Flight.new(conns2[0], date)
 groupT = GroupTicket.new([myFlight1, myFlight2], 'E')
-puts groupT.to_s
 groupT.addTicket('M', 'Edsger','Dijkstra')
-groupT.addTicket('F', 'Edsger','Dijkstra')
+groupT.addTicket('F', 'Maria','Dijkstra')
 puts groupT.to_s
 # myCompoundTicket = CompoundTicket.new([myFlight1, myFlight2], 'E', 'M', 'Edsger', 'Dijkstra')
 # puts myCompoundTicket.hold
