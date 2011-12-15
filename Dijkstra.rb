@@ -4,7 +4,10 @@ require './Airport'
 require './Date'
 require './Flight'
 class MultiDijkstraHop
-
+#Don't worry, the name of the class will change;)
+#This class provides the functionality find connected flights
+#date: the departure date, a  Date object
+#priceClass: Economy = 'E', Business = 'B', FirstClass = 'F' (with quotes)
 def initialize(date,priceClass,seats)
 @seats = seats
 @date = date
@@ -15,7 +18,7 @@ def initialize(date,priceClass,seats)
 @ad = Adameus.new
 @pc = priceClass
 end
-
+#returns an airport object corresponding to the code
   def findAirport(startCode)
     @airports.each do |airport|
       if(airport.code == startCode.to_s)
@@ -24,7 +27,14 @@ end
     end
     return "Airport not found"
   end
-  
+#This is the method to call 
+#rootCode = start airport code
+#goalCode = destination airport code
+#proc = a proc that takes a Flight object as first parameter, and an int as second
+#this proc will calculate the cost to reach a destination through the given flight. the integer parameter is 
+#the cost associated with the departure airport of that flight.
+#
+#the return value is an array of Flight objects
   def findHops(rootCode, goalCode, proc)
 	if not @loaded then 
 		self.loadGraph
@@ -35,7 +45,7 @@ end
     goal = findAirport(goalCode)
     return dijkstra(root,goal,proc)
   end
-  
+#loads the graph, finds the airport and stores the connections  
   def loadGraph 
     
     @airports = []
@@ -58,7 +68,8 @@ def loadAirport(airport,destinations)
         end
       end
   end 
-  
+ #returns all the flights from source to dest, given the date: dat.
+ # If the time is after 18:00, flights from the next day will be included in the search ---->this needs to be done right!!
 def getFlights(source,dest,dat)
 	ret = []
 	c = ''
@@ -68,7 +79,7 @@ def getFlights(source,dest,dat)
 	#	if c.nil? then return nil end
 	#end
 	i=0
-	while i<1 do #add 12 hs to the time --
+	while i<1 do #add 6 hs to the time --
 		t = @ad.connections(source,dest,dat)
 		i=i+1
 		dat = Date.new( (dat.addTimeToDate('12:00')).to_s ,nil)
@@ -84,7 +95,9 @@ def getFlights(source,dest,dat)
 	end
 	return ret
 end
-	
+
+#The dijkstra algorithm
+#heavily modified from http://blog.linkedin.com/2008/09/19/implementing-di/
 def dijkstra(source, destination, calcweight)
 	visited = Hash.new				#hash of airports and booleans
 	shortest_distances = Hash.new	#hash of airports and their distance to the source
