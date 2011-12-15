@@ -26,7 +26,7 @@ class Date
     if (!time.class.to_s.eql?("MyTime"))
       time = MyTime.new(time)
     end
-    @date += time.seconds
+    return @date + time.seconds
   end
 
   # Compares the date represented by 'this' with the date 

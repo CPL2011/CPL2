@@ -78,11 +78,12 @@ def getFlights(source,dest,dat)
 	#	c = @ad.connections(source,dest,dat)
 	#	if c.nil? then return nil end
 	#end
+	
 	i=0
 	while i<1 do #add 6 hs to the time --
 		t = @ad.connections(source,dest,dat)
 		i=i+1
-		dat = Date.new( (dat.addTimeToDate('12:00')).to_s ,nil)
+		dat = Date.new( (dat.addTimeToDate('4:00')).to_s ,nil)
 		
 		
 		if not t.nil? then c=c+t end
