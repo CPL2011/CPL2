@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # The Date class is used to contain the data and time data (relies on the Ruby-core class Time)
 # Altough not strictly enforced (def freeze in Ruby is awkward) instances of 
 # this class should be treated as immutable
@@ -41,9 +42,15 @@ class Date
       return date <=> Date.new(givenDate, givenTime).date
     end
   end
+
+  # provides a string representation of the time associated with this date
+  # following the syntax: "HH:MM"
   def time_to_s
-    return date.to_s.split(/ /)[1]
+    return (date.to_s.split(/ /)[1])[0,5]
   end
+
+  # provides a string representation of the date
+  # following the syntax: "YYYY-MM-DD"
   def to_s
     return date.to_s.split(/ /)[0]
   end
@@ -65,13 +72,15 @@ class MyTime
     @seconds = hours.to_i*3600 + minutes.to_i*60 
   end
 
+  # provides a string representation of this time objectµ
+  # following the syntax "HH:MM"
   def to_s 
     return (seconds/3600).to_s + ":" + ((seconds%3600)/60).to_s
   end
 end
 
 #-SOME-TESTS--------------------------------------------------------------------
-#test1 = Date.new("2011-03-12", "10:30")
+test1 = Date.new("2011-03-12", "10:30")
 #test2 = Date.new("2011-03-12", nil)
 #puts test1.date
 #puts test2.date
@@ -82,4 +91,6 @@ end
 #puts test2.compare(test1, nil)
 #puts timeToAdd
 #puts test1
+puts test1.time_to_s
+puts test1.to_s
 #-------------------------------------------------------------------------------
