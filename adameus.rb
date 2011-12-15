@@ -1,6 +1,7 @@
 require 'net/telnet'
 require_relative 'MultiHop'
 
+
 class String
   # If this string is shorter than len, returns an extended version of this string with padding of spaces,
   # if this string is longer than len, returns a shortened version of this string with length len.
@@ -160,14 +161,14 @@ end
 end
 
 def repl
-  adameus = Adameus.new
+ 
   while true do
         puts 'Enter Query'
         entry = gets.chomp
         if(entry == "exit")
           break
         else
-          response = adameus.send(*entry.split(/\s+/)) 
+          response = $adameus.send(*entry.split(/\s+/)) 
           if(response.nil?)
             puts 'Response Empty'
           else
@@ -177,5 +178,5 @@ def repl
         end
   end
 end
-
+$adameus = Adameus.new
 # repl

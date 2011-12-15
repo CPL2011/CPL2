@@ -5,7 +5,7 @@ require './Date'
 require './Flight'
 
 class MultiDijkstraHop
-#Don't worry, the name of the class will change;)
+#Don't worryjk, the name of the class will change;)
 #This class provides the functionality find connected flights
 #date: the departure date, a  Date object
 #priceClass: Economy = 'E', Business = 'B', FirstClass = 'F' (with quotes)
