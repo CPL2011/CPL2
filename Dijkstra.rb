@@ -8,7 +8,7 @@ class MultiDijkstraHop
 def initialize(date,priceClass)
 @date = date
 @airports = []
-@INFINITY = 1 << 32
+@INFINITY = 1 << 64
 @loaded = false
 @maxdays = 3
 @ad = Adameus.new
@@ -60,8 +60,8 @@ def getFlights(source,dest,dat)
 	ret = []
 	c = @ad.connections(source,dest,dat)
 	if c.nil? then 
-		#dat = Date.new( (dat.to_s).to_i +1,nil)
-		c = @ad.connections(source,dest,dat)
+		#dat = Date.new( (dat.to_s).to_i +1,nil)    	# TODO change the date to the next day to get other flights
+		#c = @ad.connections(source,dest,dat)
 		if c.nil? then return nil end
 	end
 
@@ -92,7 +92,7 @@ def dijkstra(source, destination, calcweight)
 	node = pq.pop
 	
 	
-	while node != destination and not node.nil?
+	while not node.nil?#while node != destination and not node.nil?
 		
 		visited[node[0]] = true
 		
@@ -104,39 +104,41 @@ def dijkstra(source, destination, calcweight)
 					
 					f = getFlights(node[0],w,node[1])
 					if(not f.nil? and f.length!=0)
-					min = @INFINITY
+					weight = @INFINITY
 					flight = nil
-					f.each do |fl|
-						t = calcweight.call(fl)
-						if t<min then 
-							min = t 
+					
+					f.each do |fl|			#get the least cost flight
+						t = calcweight.call(fl,shortest_distances[node[0]])
+						
+						if t<weight then 
+							weight = t 
 							flight = fl
 						end
 					end
 					
 					#t = f.departureTime
-					if not flight.nil? then #and (node[1].compare(t.to_s,t.getTime)<0)
+					#if not flight.nil? then #and (node[1].compare(t.to_s,t.getTime)<0)
 					
-					weight = calcweight.call(flight)
+					#weight = calcweight.call(flight,shortest_distances[node[0]])
 					
 					
-						if shortest_distances[w] > shortest_distances[node[0]] + weight
-							shortest_distances[w] = shortest_distances[node[0]] + weight
+						if shortest_distances[w] > weight#shortest_distances[node[0]] + weight
+							
+							shortest_distances[w] =  weight
 							previous[w] = [node[0],flight]
 							arrdate = Date.new(flight.date.to_s,flight.departureTime.to_s)
-							p arrdate.to_s + "  " + arrdate.time_to_s
 							arrdate.addTimeToDate(flight.flightDuration)
-							p arrdate.to_s + "  " + arrdate.time_to_s
 							pq.push([w,arrdate])
 						end
 					end
-				end
+				#end
 				end
 			end
 		#end
+		
 		node = pq.pop
 	end
-
+	
 	ret = []
 	i = 0
 	
@@ -149,23 +151,26 @@ def dijkstra(source, destination, calcweight)
 		
 		i+=1
 	end
+	
 	return ret.reverse
 end
 
 def find_shortest(rootCode,goalCode)
-	self.findHops(rootCode, goalCode, lambda{|x|  1})
+	self.findHops(rootCode, goalCode, lambda{|x,t|  t+1})
 end
 
 def find_cheapest(rootCode,goalCode)
-findHops(rootCode, goalCode,lambda{|x|  x.price(@pc).to_i})
+findHops(rootCode, goalCode,lambda{|x,t|  t+(x.price(@pc).to_i)})
+end
+def find_shortest_time(rootCode,goalCode)
+	self.findHops(rootCode, goalCode, lambda{|x,t|  t+(Date.new(x.date.to_s, x.departureTime.to_s).addTimeToDate(x.flightDuration)).to_i})
 end
 
 
-
 end
-
-ds = MultiDijkstraHop.new(Date.new("2011-12-12","06:00"),'E')
-l=ds.find_shortest('JFK','TEG')
+p 'FIND SHORTEST CPT->BKK'
+ds = MultiDijkstraHop.new(Date.new("2011-12-25","06:00"),'B')
+l=ds.find_shortest('CPT','BKK')
 p l[0].departure
 l.each do |a|
 p "departure " + a.date.to_s + '   ' +a.departureTime.to_s
@@ -174,7 +179,18 @@ p "price "+ a.price('E')
 p a.destination
 
 end
-l=ds.find_cheapest('JFK','TEG')
+p 'FIND CHEAPEST CPT->BKK'
+l=ds.find_cheapest('CPT','BKK')
+p l[0].departure
+l.each do |a|
+p "departure " + a.date.to_s + '   ' +a.departureTime.to_s
+p "duration "+ a.flightDuration.to_s
+p a.destination
+p "price "+ a.price('E')
+end
+p 'FIND MOST QUICK CPT->BKK'
+
+l=ds.find_shortest_time('CPT','BKK')
 p l[0].departure
 l.each do |a|
 p "departure " + a.date.to_s + '   ' +a.departureTime.to_s
