@@ -123,8 +123,10 @@ def dijkstra(source, destination, calcweight)
 						if shortest_distances[w] > shortest_distances[node[0]] + weight
 							shortest_distances[w] = shortest_distances[node[0]] + weight
 							previous[w] = [node[0],flight]
-							arrdate = Date.new(flight.date.to_s,flight.date.time_to_s)
+							arrdate = Date.new(flight.date.to_s,flight.departureTime.to_s)
+							p arrdate.to_s + "  " + arrdate.time_to_s
 							arrdate.addTimeToDate(flight.flightDuration)
+							p arrdate.to_s + "  " + arrdate.time_to_s
 							pq.push([w,arrdate])
 						end
 					end
