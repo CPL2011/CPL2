@@ -5,7 +5,7 @@ require './Date'
 require './Flight'
 
 class MultiDijkstraHop
-#Don't worryjk, the name of the class will change;)
+
 #This class provides the functionality find connected flights
 #date: the departure date, a  Date object
 #priceClass: Economy = 'E', Business = 'B', FirstClass = 'F' (with quotes)
@@ -13,7 +13,7 @@ def initialize(date,priceClass,seats)
 @seats = seats
 @date = date
 @airports = []
-@INFINITY = 1 << 64
+@INFINITY = 1 << 32
 @loaded = false
 @ad = Adameus.new
 @pc = priceClass
@@ -86,19 +86,21 @@ def getFlights(source,dest,dat)
 		if c.nil? then c="" end
 		
 		td = Date.new(dat.to_s,dat.time_to_s)
-		td = td.addTimeToDate('06:00')
+		td.addTimeToDate('06:00')
 		
 		if(!dat.isSameDay(td)) then
 		t = @ad.connections(source,dest,dat)
 		if not t.nil? then c = c + t end 
 		end
 		
+
+	if c.length == 0 then return nil end
 	
-	if c.nil? then return nil end
+	
 	c.split(/\n/).each do |conn|
 		f = Flight.new(conn,td.to_s)
 		f.price(@pc)
-		if (f.seats.to_i>=@seats) and (dat.compare(dat.to_s,f.departureTime.to_s)==-1) then ret.push f end
+		if (f.seats.to_i>=@seats) and (dat.compare(td.to_s,f.departureTime.to_s)==-1) then ret.push f end
 	end
 	return ret
 end
@@ -115,21 +117,20 @@ def dijkstra(source, destination, calcweight)
 		previous[a]= [nil,nil]
 	end
 	
-	
+	#info about priority queue: http://www.math.kobe-u.ac.jp/~kodama/tips-ruby-pqueue.html
 	pq = PQueue.new(proc {|x,y| shortest_distances[x[0]] < shortest_distances[y[0]]})
 	
 	pq.push([source,@date]) 		#the priority queue contains a tuple of airports and the arrival time in that airport
 	visited[source] = true
 	shortest_distances[source] = 0
-	node = pq.pop
 	
 	
-	while not node.nil?
-		
+	
+	while pq.size!=0
+		node = pq.pop
 		visited[node[0]] = true
 		
 		#if edges[v]
-		
 			node[0].connections.each do  |w|
 			
 				if visited[w]==false
@@ -137,26 +138,18 @@ def dijkstra(source, destination, calcweight)
 					
 					f = getFlights(node[0],w,node[1])
 					if(not f.nil? and f.length!=0)
-					weight = @INFINITY
-					flight = nil
-					
-					f.each do |fl|			#get the least cost flight
-						t = calcweight.call(fl,shortest_distances[node[0]])
+						weight = @INFINITY
+						flight = nil
 						
-						if t<weight then 
-							weight = t 
-							flight = fl
+						f.each do |fl|			#get the least cost flight
+							t = calcweight.call(fl,shortest_distances[node[0]])
+							if t<weight then 
+								weight = t 
+								flight = fl
+							end
 						end
-					end
 					
-					#t = f.departureTime
-					#if not flight.nil? then #and (node[1].compare(t.to_s,t.getTime)<0)
-					
-					#weight = calcweight.call(flight,shortest_distances[node[0]])
-					
-					
-						if shortest_distances[w] > weight#shortest_distances[node[0]] + weight
-							
+						if shortest_distances[w] > weight
 							shortest_distances[w] =  weight
 							previous[w] = [node[0],flight]
 							arrdate = Date.new(flight.date.to_s,flight.departureTime.to_s)
@@ -170,11 +163,10 @@ def dijkstra(source, destination, calcweight)
 			end
 		#end
 		
-		node = pq.pop
+		
 	end
 	
 	ret = []
-	i = 0
 	
 	while destination != source
 		if destination.nil? then 
@@ -183,51 +175,58 @@ def dijkstra(source, destination, calcweight)
 		end
 		f = previous[destination][1]
 
-		ret[i] = f
+		ret.push(f)
 		destination = previous[destination][0]
 		
-		i+=1
+		
 	end
 	
 	return ret.reverse
 end
 
 def find_shortest(rootCode,goalCode)
-	self.findHops(rootCode, goalCode, lambda{|x,t|  t+1})
+	self.findHops(rootCode, goalCode, lambda{|flight,oldweight|  oldweight+1})
 end
 
 def find_cheapest(rootCode,goalCode)
-findHops(rootCode, goalCode,lambda{|x,t| 
- 
-t+(x.price(@pc).to_i)})
+	findHops(rootCode, goalCode,lambda{|flight,oldweight| oldweight+(flight.seatprice)})
 end
 def find_shortest_time(rootCode,goalCode)
-	self.findHops(rootCode, goalCode, lambda{|x,t|  (Date.new(x.date.to_s, x.departureTime.to_s).addTimeToDate(x.flightDuration)).to_i})
+	self.findHops(rootCode, goalCode, lambda{|flight,oldweight|  (Date.new(flight.date.to_s, flight.departureTime.to_s).addTimeToDate(flight.flightDuration)).to_i})
 end
 
 def find_expensive(rootCode,goalCode)
-findHops(rootCode, goalCode,lambda{|x,t|  t-((x.price(@pc).to_i))})
+	findHops(rootCode, goalCode,lambda{|flight,oldweight|  oldweight-(flight.seatprice)})
+end
+#currently I have not seen this function behave different from shortest route....
+#maybe just leave this out?
+def find_optimal(rootCode,goalCode)
+	findHops(rootCode, goalCode, 
+		lambda{|flight,oldweight| 
+			oldweight + (flight.date.date.to_i + (flight.flightDuration).seconds - @date.date.to_i)/1200 + 100 + flight.seatprice/5 
+			# oldweight + (number of hours between arrival and departure + 100 (per hop))*3 + seatprice/5 (~25-250)
+			})
+end
 end
 
-end
-
+#################TESTCODE######################
 def printthis(l)
-if not l.nil? then
-p l[0].departure
-l.each do |a|
-p "departure " + a.date.to_s + '   ' +a.departureTime.to_s
-p "duration "+ a.flightDuration.to_s
-p a.destination
-p "price "+ a.price('E')
-end
-end
+	if not l.nil? then
+		p l[0].departure
+		l.each do |a|
+			p "departure " + a.date.to_s + '   ' +a.departureTime.to_s
+			p "duration "+ a.flightDuration.to_s
+			p a.destination
+			p "price "+ a.seatprice.to_s
+		end
+	end
 end
 
-
-start = 'AMS'
-dest = 'BCN'
+##BEST EXAMPLE -- start = AMS, dest=BCN
+start = 'TEG'
+dest = 'AKL'
 p 'FIND SHORTEST '+start+'->'+dest
-ds = MultiDijkstraHop.new(Date.new("2011-12-10","06:00"),'B',5)
+ds = MultiDijkstraHop.new(Date.new("2011-12-11","06:00"),'B',5)
 l=ds.find_shortest(start,dest)
 printthis(l)
 
@@ -241,6 +240,10 @@ printthis(l)
 
 p 'FIND MOST EXPENSIVE '+start+'->'+dest
 l=ds.find_expensive(start,dest)
+printthis(l)
+
+p 'FIND OPTIMAL '+start+'->'+dest
+l=ds.find_optimal(start,dest)
 printthis(l)
 
 
