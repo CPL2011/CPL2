@@ -106,7 +106,7 @@ class CompoundTicket
 							"From: " + ticket.flight.departureAirport.to_s + " To: " + ticket.flight.destinationAirport.to_s + "\n" +
 							"Departure: " + ticket.flight.date.to_s + "\n" +
 							"Duration: " + ticket.flight.flightDuration.to_s + "\n"+
-							"Price: " + ticket.flight.seatprice.to_s + "\n" +
+							"Price: " + ticket.flight.seatprice.to_s + "\n" 
 							
 		i+=1
     end
