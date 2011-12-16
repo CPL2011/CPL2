@@ -5,7 +5,7 @@ require './Date'
 require './Flight'
 
 class MultiDijkstraHop
-#Don't worryjk, the name of the class will change;)
+
 #This class provides the functionality find connected flights
 #date: the departure date, a  Date object
 #priceClass: Economy = 'E', Business = 'B', FirstClass = 'F' (with quotes)
@@ -86,19 +86,21 @@ def getFlights(source,dest,dat)
 		if c.nil? then c="" end
 		
 		td = Date.new(dat.to_s,dat.time_to_s)
-		td = td.addTimeToDate('06:00')
+		td.addTimeToDate('06:00')
 		
 		if(!dat.isSameDay(td)) then
 		t = @ad.connections(source,dest,dat)
 		if not t.nil? then c = c + t end 
 		end
 		
+
+	if c.length == 0 then return nil end
 	
-	if c.nil? then return nil end
+	
 	c.split(/\n/).each do |conn|
 		f = Flight.new(conn,td.to_s)
 		f.price(@pc)
-		if (f.seats.to_i>=@seats) and (dat.compare(dat.to_s,f.departureTime.to_s)==-1) then ret.push f end
+		if (f.seats.to_i>=@seats) and (dat.compare(td.to_s,f.departureTime.to_s)==-1) then ret.push f end
 	end
 	return ret
 end
@@ -129,7 +131,6 @@ def dijkstra(source, destination, calcweight)
 		visited[node[0]] = true
 		
 		#if edges[v]
-		#p "node  " + node[0].to_s + "   isvisited:  " + visited[node[0]].to_s
 			node[0].connections.each do  |w|
 			
 				if visited[w]==false
@@ -142,7 +143,6 @@ def dijkstra(source, destination, calcweight)
 						
 						f.each do |fl|			#get the least cost flight
 							t = calcweight.call(fl,shortest_distances[node[0]])
-							#p "from  " +  fl.departure.to_s + " to  " +  fl.destination.to_s
 							if t<weight then 
 								weight = t 
 								flight = fl
@@ -150,7 +150,6 @@ def dijkstra(source, destination, calcweight)
 						end
 					
 						if shortest_distances[w] > weight
-							#p "suitablenode   " + w.to_s
 							shortest_distances[w] =  weight
 							previous[w] = [node[0],flight]
 							arrdate = Date.new(flight.date.to_s,flight.departureTime.to_s)
@@ -197,7 +196,7 @@ def find_shortest_time(rootCode,goalCode)
 end
 
 def find_expensive(rootCode,goalCode)
-	findHops(rootCode, goalCode,lambda{|flight,oldweight|  oldweight-((flight.price(@pc).to_i))})
+	findHops(rootCode, goalCode,lambda{|flight,oldweight|  oldweight-(flight.seatprice)})
 end
 #currently I have not seen this function behave different from shortest route....
 #maybe just leave this out?
