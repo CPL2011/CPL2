@@ -71,10 +71,12 @@ class MyTime
   
   # time : the time argument following the previously defined syntax e.g.: "10:30"
   def initialize(time)
-    splitTime = time.split(/:/)
-    hours = splitTime[0]
-    minutes = splitTime[1]
-    @seconds = hours.to_i*3600 + minutes.to_i*60 
+    if (time.class.to_s.eql?("String"))
+      splitTime = time.split(/:/)
+      hours = splitTime[0]
+      minutes = splitTime[1]
+      @seconds = hours.to_i*3600 + minutes.to_i*60
+    end
   end
 
   # provides a string representation of this time objectµ

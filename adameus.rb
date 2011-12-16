@@ -2,6 +2,7 @@ require 'net/telnet'
 require './Date'
 require './Dijkstra'
 require './Ticket'
+require './Flight'
 class String
   # If this string is shorter than len, returns an extended version of this string with padding of spaces,
   # if this string is longer than len, returns a shortened version of this string with length len.
@@ -115,11 +116,22 @@ class Adameus
   # airportDestinationCode : a String specifying the airport that the passenger wishes to reach
   # seatclass : a String/Char specifying the class of the seating arrangement
   # people : a list of Struct::Person which specifies the people for which the flight should be booked 
-  def hold_cheapest(date, airportDepartureCode, airportDestinationCode,  seatclass, people)
+  def hold_cheapest(date, airportDepartureCode, airportDestinationCode,  seatclass, *rest)
+    people = strings2people(*rest)
     flights = MultiDijkstraHop.new(Date.new(date, nil), seatclass, people.length).find_cheapest(airportDestinationCode, airportDepartureCode)
     return hold_helper(flights, seatclass, people)
   end
 
+  # Converts an unspecified number of String parameters into a list of Person instances
+  # *rest : an undefined number of String parameters
+  # each String follows the following syntax: "<gender>, <firstname>, <surname>"
+  # e.g.: "M, John, McCarthy", "M, Edsger, Dijkstra", "F, Ada Lovelace"
+  def strings2people(*rest) 
+    return *rest.map do |person_info|
+      split_info = person_info.split(/, /)
+      Person.new(split_info[0], split_info[1], split_info[2])
+    end
+  end
   # If successful, returns the booking code(s) of the requested flight arrangement(s). 
   # If unsuccessful return an error. The booking codes will specify the connection that will 
   # allow the traveler to reach his destination in the least possible hops
@@ -128,7 +140,8 @@ class Adameus
   # airportDestinationCode : a String specifying the airport that the passenger wishes to reach
   # seatclass : a String/Char specifying the class of the seating arrangement
   # people : a list of Struct::Person which specifies the people for which the flight should be booked 
-  def hold_minimal_hops(date, airportDepartureCode, airportDestinationCode, seatclass, people)
+  def hold_minimal_hops(date, airportDepartureCode, airportDestinationCode, seatclass, *rest)
+    people = strings2people(*rest)
     flights = MultiDijkstraHop.new(Date.new(date, nil), seatclass, people.length).find_shortest(airportDestinationCode, airportDepartureCode)
     return hold_helper(flights, seatclass, people)
   end
@@ -141,7 +154,8 @@ class Adameus
   # airportDestinationCode : a String specifying the airport that the passenger wishes to reach
   # seatclass : a String/Char specifying the class of the seating arrangement
   # people : a list of Struct::Person which specifies the people for which the flight should be booked 
-  def hold_quickest(date, airportDepartureCode, airportDestinationCode, seatclass, people)
+  def hold_quickest(date, airportDepartureCode, airportDestinationCode, seatclass, *rest)
+    people = strings2people(*rest)
     flights = MultiDijkstraHop.new(Date.new(date, nil), seatclass, people.length).uniform_cost_algorithm.find_shortest_time(airportDestinationCode, airportDepartureCode)
     return hold_helper(flights, seatclass, people)
   end
@@ -219,31 +233,6 @@ class Adameus
     }
   end
 
-  # def findpath(airportDepartureCode, airportDestinationCode, visited)
-  #   destinationArray = destinations(airportDepartureCode).split
-  #   visited.push(airportDepartureCode)
-    
-  #   if (destinationArray.include?(airportDestinationCode))
-  #     visited.push(airportDestinationCode)
-  #     return visited
-  #   else 
-  #     destinationArray.each do |x| 
-  #       if (!visited.include?(x)) then
-  #         return findpath(x, airportDestinationCode, visited);
-  #       end
-  #     end
-  #   end
-  #   return []
-  # end
-
-  # def flighthops(airportDepartureCode, airportDestinationCode)
-  #   findpath(airportDepartureCode, airportDestinationCode, [])
-  # end
-  
-  # def l
-  #   MultiHop.new.findHops('PEK', 'AKL')
-  # end
-  
   def method_missing(m, *args, &block)  
     puts "There's no Query called #{m} here -- please try again."  
   end 
@@ -287,9 +276,9 @@ def repl
   end
 end
 $adameus = Adameus.new
-puts "adameus"
 edsger_dijkstra = Person.new("M", "Edsger", "Dijkstra")
-puts $adameus.hold_cheapest("2012-01-15", "VIE", "BRU",  "B", [edsger_dijkstra])
+puts $adameus.hold_cheapest("2012-01-15", "TEG", "AKL",  "B", "M, Edsger, Dijkstra", "M, John, McCarthy")
+#puts $adameus.version
 #puts $adameus.connections("VIE", "BRU", "2012-01-15")
 # puts $adameus.cancel("5b129c0f1f1f6b911f88b759470dbc7c")
 #puts $adameus.hold("2012-01-15", "SJT208", "E", "M", "Edsger", "Dijkstra")
