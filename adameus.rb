@@ -84,19 +84,17 @@ class Adameus
   # returns the two airports which the flight with the given flightnumber connects.
   def flight_airports(flightnumber)
     output = query_host("F" + flightnumber.to_s).chomp()
-    if output == "FN"
-      puts "No such flightnumber"
+    if (output == "FN" || output == "ERRIM") then puts "No such flightnumber"
     else return output
     end
   end
   
   # returns the days of the week that the plane with the given flight number flies
   def weekdays(flightnumber)
-    query_host("W" + flightnumber.to_s).chomp()
-    if output == "FN"
+    output = query_host("W" + flightnumber.to_s).chomp()
+    if (output == "FN" || output == "ERRIM") 
       puts "No such flightnumber"
-    else 
-      return output 
+    else return output 
     end
   end
   
@@ -178,7 +176,7 @@ class Adameus
       puts $!.message
     end
     output = query_host("H" + date.to_s + flightnumber.to_s + seatclass.to_s + gender.to_s + firstname + surname).chomp()
-    if( output == "FN") then
+    if (output == "FN" || output == "ERRIM") then
       puts "No seats available(" + output + ")"
     else 
       return output
@@ -197,7 +195,7 @@ class Adameus
     if (bookingcode.length != 32) then puts "An invalid bookingcode was given"
     else 
       output = query_host("B" + bookingcode.to_s)
-      if (output.chomp() == "FN") then puts "An invalid booking code was given" 
+      if (output.chomp() == "FN" || output.chomp() == "ERRIM") then puts "An invalid booking code was given" 
       elsif (output.chomp() == "FA") then puts "The requested seat has already been booked" 
       else return output
       end
@@ -211,7 +209,7 @@ class Adameus
   # bookingocde: A String representation of the bookingcode
   def cancel(bookingcode)
     output = query_host("X" + bookingcode.to_s)
-    if (output.chomp() == "FN") then puts "An invalid booking code was given" 
+    if (output.chomp() == "FN" || output.chomp() == "ERRIM") then puts "An invalid booking code was given" 
     elsif (output.chomp() == "FX") then puts "The booking is older than seven days and can no longer be cancelled" 
     else return output
     end
@@ -219,7 +217,7 @@ class Adameus
   
   def query_booking(bookingcode)
     output = query_host("Q" + bookingcode.to_s).chomp()
-    if (output == "FN") then puts  "No such bookingcode"
+    if (output == "FN" || output == "ERRIM") then puts  "No such bookingcode"
     else return output
     end
   end
@@ -264,7 +262,7 @@ class Adameus
     end
   end
   
-  private :open_host, :close_host, :query_host, :hold_helper # all methods listed here will be made private: not accessible for outside objects
+  private :open_host, :close_host, :query_host, :hold_helper, :strings2people # all methods listed here will be made private: not accessible for outside objects
 end
 
 def repl
@@ -286,7 +284,7 @@ def repl
   end
 end
 $adameus = Adameus.new
-puts $adameus.weekdays("lols")
+puts $adameus.weekdays("Taketsuru")
 edsger_dijkstra = Person.new("M", "Edsger", "Dijkstra")
 puts $adameus.book("tralalalalal")
 puts $adameus.hold_cheapest("2012-01-15", "TEG", "AKL",  "B", "M, Edsger, Dijkstra", "M, John, McCarthy")
