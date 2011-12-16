@@ -283,11 +283,11 @@ def repl
         end
   end
 end
-$adameus = Adameus.new
-puts $adameus.weekdays("Taketsuru")
-edsger_dijkstra = Person.new("M", "Edsger", "Dijkstra")
-puts $adameus.book("tralalalalal")
-puts $adameus.hold_cheapest("2012-01-15", "TEG", "AKL",  "B", "M, Edsger, Dijkstra", "M, John, McCarthy")
+#$adameus = Adameus.new
+#puts $adameus.weekdays("Taketsuru")
+#edsger_dijkstra = Person.new("M", "Edsger", "Dijkstra")
+#puts $adameus.book("tralalalalal")
+#puts $adameus.hold_cheapest("2012-01-15", "TEG", "AKL",  "B", "M, Edsger, Dijkstra", "M, John, McCarthy")
 #puts $adameus.version
 #puts $adameus.connections("VIE", "BRU", "2012-01-15")
 # puts $adameus.cancel("5b129c0f1f1f6b911f88b759470dbc7c")

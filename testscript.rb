@@ -1,33 +1,22 @@
 require_relative 'adameus'
 
-Adameus.new.execute do
-  #version
- #puts airports
-  puts connections('VIE', 'BRU', '2012-01-15')
-  #puts destinations('BRU')
+$adameus = Adameus.new
 
- puts MultiHop.new.findHops('PEK', 'AKL')
- reservation = hold("2011-11-05", "BEL062", "B", "M", "John", "Doe")
-  
- puts book(reservation[1,reservation.size-2])
+puts "\nadameus.version"
+puts $adameus.version
 
-#   puts "startmultihop"
-  #puts findpath('VIE', 'PEK', [])
-#   flight('VIE', 'FCO', '2012-01-15').each do |x|
-#     puts("------------------")
-#     puts x
-#     puts("------------------")
-#   end
-#   puts "endmultihop"
-end
+puts "\nadameus.airlines"
+puts $adameus.airlines
 
-=begin
-  Example queries:
-  airports
-  connections('VIE', 'BRU', '2012-01-15'), also connections(:VIE, :BRU, '2012-01-15')
-  seats('2012-01-15', 'BEL062', 'B'), also seats('2012-01-15', :BEL062, :B)
-  
-  To exit interactive mode, enter query 'exit'.
-=end
+puts "\nadameus.airports"
+puts $adameus.airports
 
-#Adameus.new.repl
+puts "\nadameus.connections(\"VIE\", \"BRU\", \"2012-01-15\")"
+puts $adameus.connections("VIE", "BRU", "2012-01-15")
+
+puts "\nadameus.weekdays(\"Whrong FlightNumber\")"
+$adameus.weekdays("Whrong FlightNumber")
+
+#puts "\nadameus.hold_cheapest(\"2012-01-15\", \"TEG\", \"AKL\",  \"B\", \"M, Edsger, Dijkstra\", \"M, John, McCarthy\")"
+#puts $adameus.hold_cheapest("2012-01-15", "TEG", "AKL",  "B", "M, Edsger, Dijkstra", "M, John, McCarthy")
+#puts $adameus.book("tralalalalal")
