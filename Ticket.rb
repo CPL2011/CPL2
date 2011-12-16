@@ -24,19 +24,24 @@ class GroupTicket
   end
   
   def hold
-    tickets.each do |ticket| 
-      ticket.hold
+    holding = []
+    begin
+      tickets.each do |ticket| 
+        ticket.hold
+        holding << ticket
+      end
+    rescue
+      holding.each{|ticket| ticket.cancel}
     end
   end
 
   def book
-    tickets.inject([]) do |all, ticket|
-      begin
+    begin
+      tickets.each do |ticket|
         ticket.book
-        all << ticket
-      rescue
-        all.each{|ticket| ticket.cancel}
       end
+    rescue
+      tickets.each{|ticket| ticket.cancel}
     end
   end
 
@@ -86,12 +91,13 @@ class CompoundTicket
     end
     ticketOpening = "-----------TICKET-------------\n"
     customer = title + " " + compoundTicket.last.firstname.strip + " " + compoundTicket.last.surname.strip + "\n"
+    status = "Status = " + compoundTicket.last.booking.status + "\n"
     travel = "route = " + flightString + "\n"
     seat = "seat = " + seatclass + "\n"
     travelCost = "price = " + price.to_s + "\n"
     ticketClosure = "------------------------------\n"
 
-    return ticketOpening + customer + travel + seat + travelCost + ticketClosure
+    return ticketOpening + status + customer + travel + seat + travelCost + ticketClosure
   end
 
   def hold
@@ -107,6 +113,7 @@ class CompoundTicket
   end
 
   def cancel
+    puts "ticket cancelled"
     compoundTicket.each do |ticket|
       ticket.cancel
     end
@@ -132,8 +139,8 @@ class Ticket
     @gender = gender
     @firstname = firstname
     @surname = surname
-    @booking = Struct::Booking.new(nil, nil, nil)
-    @adameus = adameus = Adameus.new 
+    @booking = Struct::Booking.new(nil, nil, "New", nil)
+    @adameus = adameus = Adameus.new
   end
 
   def hold
@@ -143,24 +150,32 @@ class Ticket
       @booking[:timeStamp] = Time.now
       b = adameus.query_booking(@booking.bookingCode)
       @booking[:price] = b[64,69]
-      puts @booking.price
+      @booking[:status] = "Holding seat"
+    else
+      @booking[:status] = "Hold Failed"
     end
   end
 
   def book
     raise "A holding has to be made before a booking can be processed" if booking.bookingCode.nil?
-    adameus.book(booking.bookingCode)
+    responce = adameus.book(booking.bookingCode)
+    if (responce.length == 69) then
+      booking[:status] = "Booked"
+    else
+      booking[:status] = "Booking Failed"
+    end
   end
 
   def cancel
     raise "No holding/booking made" if booking.bookingCode.nil?
     if ((booking.timeStamp + SEVEN_DAYS <=> Time.now) == 1)
       adameus.cancel(booking.bookingCode)
+      booking[:status] = "Cancelled"
     end
   end
 end
 
-Struct.new("Booking", :bookingCode, :timeStamp, :price)
+Struct.new("Booking", :bookingCode, :timeStamp, :status, :price)
 
 #-SOME-TESTS--------------------------------------------------------------------
 date = '2012-01-15'
@@ -174,6 +189,8 @@ groupT.addTicket('M', 'Edsger','Dijkstra')
 groupT.addTicket('F', 'Maria','Dijkstra')
 puts groupT.to_s
 groupT.hold
+puts groupT.to_s
+groupT.book
 puts groupT.to_s
 # myCompoundTicket = CompoundTicket.new([myFlight1, myFlight2], 'E', 'M', 'Edsger', 'Dijkstra')
 # puts myCompoundTicket.hold
