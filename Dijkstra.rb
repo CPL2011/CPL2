@@ -15,7 +15,7 @@ def initialize(date,priceClass,seats)
 @airports = []
 @INFINITY = 1 << 32
 @loaded = false
-@ad = Adameus.new
+# @ad = Adameus.new
 @pc = priceClass
 
 end
@@ -41,7 +41,7 @@ end
 		self.loadGraph
 		@loaded = true
 	end 
-	
+
     root = findAirport(rootCode)
     goal = findAirport(goalCode)
     return dijkstra(root,goal,proc)
@@ -50,11 +50,11 @@ end
   def loadGraph 
     
     @airports = 
-    @ad.airports.split(/\n/).map do |airport|
+    $adameus.airports.split(/\n/).map do |airport|
        Airport.new(airport[0,3])
     end
     @airports.each do |airport|
-    loadAirport(airport,@ad.destinations(airport.code))
+    loadAirport(airport,$adameus.destinations(airport.code))
     end
   end
 def loadAirport(airport,destinations)
@@ -74,29 +74,29 @@ def loadAirport(airport,destinations)
  # If the time is after 18:00, flights from the next day will be included in the search ---->this needs to be done right!!
 def getFlights(source,dest,dat)
 	ret = []
-	
+
 	#if c.nil? then 
 	#	dat = Date.new( (dat.addTimeToDate('24:00')).to_s ,nil)    	# TODO change the date to the next day to get other flights
-	#	c = @ad.connections(source,dest,dat)
+	#	c = $adameus.connections(source,dest,dat)
 	#	if c.nil? then return nil end
 	#end
 
-	
-		c = @ad.connections(source,dest,dat)
+
+		c = $adameus.connections(source,dest,dat)
 		if c.nil? then c="" end
-		
+
 		td = Date.new(dat.to_s,dat.time_to_s)
 		td.addTimeToDate('06:00')
-		
+
 		if(!dat.isSameDay(td)) then
-		t = @ad.connections(source,dest,dat)
+		t = $adameus.connections(source,dest,dat)
 		if not t.nil? then c = c + t end 
 		end
-		
+
 
 	if c.length == 0 then return nil end
-	
-	
+
+
 	c.split(/\n/).each do |conn|
 		f = Flight.new(conn,td.to_s)
 		f.price(@pc)
@@ -116,31 +116,31 @@ def dijkstra(source, destination, calcweight)
 		shortest_distances[a]=@INFINITY
 		previous[a]= [nil,nil]
 	end
-	
+
 	#info about priority queue: http://www.math.kobe-u.ac.jp/~kodama/tips-ruby-pqueue.html
 	pq = PQueue.new(proc {|x,y| shortest_distances[x[0]] < shortest_distances[y[0]]})
-	
+
 	pq.push([source,@date]) 		#the priority queue contains a tuple of airports and the arrival time in that airport
 	visited[source] = true
 	shortest_distances[source] = 0
-	
-	
-	
+
+
+
 	while pq.size!=0
 		node = pq.pop
 		visited[node[0]] = true
-		
+
 		#if edges[v]
 			node[0].connections.each do  |w|
-			
+
 				if visited[w]==false
-					
-					
+
+
 					f = getFlights(node[0],w,node[1])
 					if(not f.nil? and f.length!=0)
 						weight = @INFINITY
 						flight = nil
-						
+
 						f.each do |fl|			#get the least cost flight
 							t = calcweight.call(fl,shortest_distances[node[0]])
 							if t<weight then 
@@ -148,26 +148,26 @@ def dijkstra(source, destination, calcweight)
 								flight = fl
 							end
 						end
-					
+
 						if shortest_distances[w] > weight
 							shortest_distances[w] =  weight
 							previous[w] = [node[0],flight]
 							arrdate = Date.new(flight.date.to_s,flight.departureTime.to_s)
 							arrdate.addTimeToDate(flight.flightDuration)
 							pq.push([w,arrdate])
-							
+
 						end
 					end
 				#end
 				end
 			end
 		#end
-		
-		
+
+
 	end
-	
+
 	ret = []
-	
+
 	while destination != source
 		if destination.nil? then 
 		p "No flights available, try an other day..."
@@ -177,10 +177,10 @@ def dijkstra(source, destination, calcweight)
 
 		ret.push(f)
 		destination = previous[destination][0]
-		
-		
+
+
 	end
-	
+
 	return ret.reverse
 end
 
@@ -245,5 +245,3 @@ printthis(l)
 p 'FIND OPTIMAL '+start+'->'+dest
 l=ds.find_optimal(start,dest)
 printthis(l)
-
-
