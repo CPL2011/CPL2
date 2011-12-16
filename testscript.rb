@@ -28,6 +28,13 @@ puts $adameus.weekdays("SJT208")
 
 puts "\nadameus.seats(\"2012-01-15\", \"SJT208\", \"B\")"
 puts $adameus.seats("2012-01-15", "SJT208", "B")
-#puts "\nadameus.hold_cheapest(\"2012-01-15\", \"TEG\", \"AKL\",  \"B\", \"M, Edsger, Dijkstra\", \"M, John, McCarthy\")"
-#puts $adameus.hold_cheapest("2012-01-15", "TEG", "AKL",  "B", "M, Edsger, Dijkstra", "M, John, McCarthy")
-#puts $adameus.book("tralalalalal")
+
+puts "\nadameus.hold_minimal_hops(\"2012-01-15\", \"TEG\", \"AKL\",  \"B\", \"M, Edsger, Dijkstra\", \"M, John, McCarthy\")"
+puts $adameus.hold_minimal_hops("2012-01-15", "TEG", "AKL",  "B", "M, Edsger, Dijkstra", "M, John, McCarthy")
+
+puts "adameus.hold_quickest(\"2012-01-15\", \"TEG\", \"AKL\",  \"B\", \"M, Edsger, Dijkstra\", \"M, John, McCarthy\")"
+puts $adameus.hold_quickest("2012-01-15", "TEG", "AKL",  "B", "M, Edsger, Dijkstra", "M, John, McCarthy")
+
+puts "\nadameus.hold_cheapest(\"2012-01-15\", \"TEG\", \"AKL\",  \"B\", \"M, Edsger, Dijkstra\", \"M, John, McCarthy\")"
+puts $adameus.hold_cheapest("2012-01-15", "TEG", "AKL",  "B", "M, Edsger, Dijkstra", "M, John, McCarthy")
+
