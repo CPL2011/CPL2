@@ -68,11 +68,19 @@ class Adameus
   end
   
   def flight_airports(flightnumber)
-    query_host("F" + flightnumber.to_s)
+    output = query_host("F" + flightnumber.to_s).chomp()
+    if output == "FN"
+      raise "No such flightnumber"
+    end
+    return output
   end
   
   def weekdays(flightnumber)
-    query_host("W" + flightnumber.to_s)
+    query_host("W" + flightnumber.to_s).chomp()
+    if output == "FN"
+      raise "No such flightnumber"
+    end
+    return output
   end
   
   def seats(date, flightnumber, seatclass)
