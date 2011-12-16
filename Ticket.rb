@@ -24,25 +24,37 @@ class GroupTicket
   end
   
   def hold
-    tickets.each do |ticket| 
-      ticket.hold
+    holding = []
+    begin
+      tickets.each do |ticket| 
+        ticket.hold
+        holding << ticket
+      end
+    rescue
+      holding.each{|ticket| ticket.cancel}
     end
   end
 
   def book
-    tickets.each do |ticket|
-      ticket.book
+    begin
+      tickets.each do |ticket|
+        ticket.book
+      end
+    rescue
+      tickets.each{|ticket| ticket.cancel}
     end
   end
 
   def cancel
     tickets.each do |ticket|
-      ticket.cancel
+      begin
+        ticket.cancel
+      end
     end
   end
   
   def status
-    tickets.each do |ticket|
+    return tickets.map do |ticket|
       ticket.status
     end
   end  
@@ -79,12 +91,13 @@ class CompoundTicket
     end
     ticketOpening = "-----------TICKET-------------\n"
     customer = title + " " + compoundTicket.last.firstname.strip + " " + compoundTicket.last.surname.strip + "\n"
+    status = "Status = " + compoundTicket.last.booking.status + "\n"
     travel = "route = " + flightString + "\n"
     seat = "seat = " + seatclass + "\n"
     travelCost = "price = " + price.to_s + "\n"
     ticketClosure = "------------------------------\n"
 
-    return ticketOpening + customer + travel + seat + travelCost + ticketClosure
+    return ticketOpening + status + customer + travel + seat + travelCost + ticketClosure
   end
 
   def hold
@@ -106,9 +119,7 @@ class CompoundTicket
   end
   
   def status
-    compoundTicket.each do |ticket|
-      ticket.status
-    end
+    return compoundTicket.last.status
   end  
 end
 
@@ -125,8 +136,8 @@ class Ticket
     @gender = gender
     @firstname = firstname
     @surname = surname
-    @booking = Struct::Booking.new(nil, nil)
-    @adameus = adameus = Adameus.new 
+    @booking = Struct::Booking.new(nil, nil, "New", nil)
+    @adameus = adameus = Adameus.new
   end
 
   def hold
@@ -134,39 +145,55 @@ class Ticket
     if (feedback.size == 33) 
       @booking[:bookingCode] = feedback[1,32]
       @booking[:timeStamp] = Time.now
+      b = adameus.query_booking(@booking.bookingCode)
+      @booking[:price] = b[64,69]
+      @booking[:status] = "Holding seat"
+    else
+      @booking[:status] = "Hold Failed"
     end
   end
 
   def book
     raise "A holding has to be made before a booking can be processed" if booking.bookingCode.nil?
-    adameus.book(booking.bookingCode)
+    responce = adameus.book(booking.bookingCode)
+    if (responce.length == 69) then
+      booking[:status] = "Booked"
+    else
+      booking[:status] = "Booking Failed"
+    end
   end
 
   def cancel
     raise "No holding/booking made" if booking.bookingCode.nil?
     if ((booking.timeStamp + SEVEN_DAYS <=> Time.now) == 1)
       adameus.cancel(booking.bookingCode)
+      booking[:status] = "Cancelled"
     end
   end
   
   def status
-    raise "No holding/booking made" if booking.bookingCode.nil?
-    adameus.query_booking(booking.bookingCode)    
+    return booking.status
   end
 end
 
-Struct.new("Booking", :bookingCode, :timeStamp)
+Struct.new("Booking", :bookingCode, :timeStamp, :status, :price)
 
 #-SOME-TESTS--------------------------------------------------------------------
 date = '2012-01-15'
 adameus = Adameus.new
-conns = adameus.connections('VIE', 'BRU', date).split(/\n/)
-conns2 = adameus.connections('BRU', 'FRA', date).split(/\n/)
+conns = adameus.connections('FRA', 'BRU', date).split(/\n/)
+conns2 = adameus.connections('BRU', 'VIE', date).split(/\n/)
 myFlight1 = Flight.new(conns[0], date)
 myFlight2 = Flight.new(conns2[0], date)
 groupT = GroupTicket.new([myFlight1, myFlight2], 'E')
 groupT.addTicket('M', 'Edsger','Dijkstra')
 groupT.addTicket('F', 'Maria','Dijkstra')
+puts groupT.to_s
+groupT.hold
+puts groupT.to_s
+groupT.book
+puts groupT.to_s
+groupT.cancel
 puts groupT.to_s
 # myCompoundTicket = CompoundTicket.new([myFlight1, myFlight2], 'E', 'M', 'Edsger', 'Dijkstra')
 # puts myCompoundTicket.hold
