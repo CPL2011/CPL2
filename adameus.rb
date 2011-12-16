@@ -68,11 +68,19 @@ class Adameus
   end
   
   def flight_airports(flightnumber)
-    query_host("F" + flightnumber.to_s)
+    output = query_host("F" + flightnumber.to_s).chomp()
+    if output == "FN"
+      raise "No such flightnumber"
+    end
+    return output
   end
   
   def weekdays(flightnumber)
-    query_host("W" + flightnumber.to_s)
+    query_host("W" + flightnumber.to_s).chomp()
+    if output == "FN"
+      raise "No such flightnumber"
+    end
+    return output
   end
   
   def seats(date, flightnumber, seatclass)
@@ -96,30 +104,44 @@ class Adameus
     surname = surname.to_s
     firstname.fix_length!(15)
     surname.fix_length!(20)
-    query_host("H" + date.to_s + flightnumber.to_s + seatclass.to_s + gender.to_s + firstname + surname)
+    output = query_host("H" + date.to_s + flightnumber.to_s + seatclass.to_s + gender.to_s + firstname + surname).chomp()
+    if( output == "FN") then
+      raise "No seats available(" + output + ")"
+    end
+    return output
   end
   
   def book(bookingcode)
     if (bookingcode.size == 32)
-      output = query_host("B" + bookingcode.to_s) 
-      if output.chomp() == "FN" 
-        return "invalid booking number"
-      elsif output.chomp() == "FA" 
-        return "the seat has already been booked"
+      output = query_host("B" + bookingcode.to_s).chomp() 
+      if output == "FN" 
+#        return "invalid booking number"
+        raise "invalid booking number"
+      elsif output == "FA" 
+#        return "the seat has already been booked"
+        raise "the seat has already been booked"
       else 
-        return output.chomp()
+        return output
       end
     end
   end
-
-  
   
   def cancel(bookingcode)
-    query_host("X" + bookingcode.to_s)
+    output = query_host("X" + bookingcode.to_s).chomp()
+    if( output == "FN")
+      raise "Invalid booking number"
+    elsif output == "FX"
+      raise "Booking is older than seven days and cannot be cancelled"
+    end
+    return output
   end
   
   def query_booking(bookingcode)
-    query_host("Q" + bookingcode.to_s)
+    output = query_host("Q" + bookingcode.to_s).chomp()
+    if output == "FN"
+      raise "No such bookingcode"
+    end
+    return output
   end
 
   # def priceOfFlight(date, seatClass, airportDepartureCode, airportDestinationCode)
