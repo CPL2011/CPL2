@@ -1,5 +1,4 @@
-require_relative 'Flight'
-require_relative 'adameus'
+require './Flight'
 
 class GroupTicket
   attr_reader :tickets, :flights, :seatclass
@@ -155,15 +154,15 @@ class Ticket
     @firstname = firstname
     @surname = surname
     @booking = Struct::Booking.new(nil, nil, "New", nil)
-    @adameus = adameus = Adameus.new
+    # @adameus = adameus = Adameus.new
   end
 
   def hold
-    feedback = adameus.hold(flight.date, flight.flightCode, seatclass, gender, firstname, surname).chomp
+    feedback = $adameus.hold(flight.date, flight.flightCode, seatclass, gender, firstname, surname).chomp
     if (feedback.size == 33) 
       @booking[:bookingCode] = feedback[1,32]
       @booking[:timeStamp] = Time.now
-      b = adameus.query_booking(@booking.bookingCode)
+      b = $adameus.query_booking(@booking.bookingCode)
       @booking[:price] = b[64,69]
       @booking[:status] = "Holding seat"
     else
@@ -173,7 +172,7 @@ class Ticket
 
   def book
     raise "A holding has to be made before a booking can be processed" if booking.bookingCode.nil?
-    responce = adameus.book(booking.bookingCode)
+    responce = $adameus.book(booking.bookingCode)
     if (responce.length == 69) then
       booking[:status] = "Booked"
     else
@@ -184,7 +183,7 @@ class Ticket
   def cancel
     raise "No holding/booking made" if booking.bookingCode.nil?
     if ((booking.timeStamp + SEVEN_DAYS <=> Time.now) == 1)
-      adameus.cancel(booking.bookingCode)
+      $adameus.cancel(booking.bookingCode)
       booking[:status] = "Cancelled"
     end
   end
@@ -197,22 +196,22 @@ end
 Struct.new("Booking", :bookingCode, :timeStamp, :status, :price)
 
 #-SOME-TESTS--------------------------------------------------------------------
-date = '2012-01-15'
-adameus = Adameus.new
-conns = adameus.connections('FRA', 'BRU', date).split(/\n/)
-conns2 = adameus.connections('BRU', 'VIE', date).split(/\n/)
-myFlight1 = Flight.new(conns[0], date)
-myFlight2 = Flight.new(conns2[0], date)
-groupT = GroupTicket.new([myFlight1], 'E')
-groupT.addTicket('M', 'Edsger','Dijkstra')
-groupT.addTicket('F', 'Maria','Dijkstra')
-puts groupT.to_s
-groupT.hold
-puts groupT.to_s
-groupT.book
-puts groupT.to_s
-groupT.cancel
-puts groupT.to_s
+# date = '2012-01-15'
+# #adameus = Adameus.new
+# conns = $adameus.connections('FRA', 'BRU', date).split(/\n/)
+# conns2 = $adameus.connections('BRU', 'VIE', date).split(/\n/)
+# myFlight1 = Flight.new(conns[0], date)
+# myFlight2 = Flight.new(conns2[0], date)
+# groupT = GroupTicket.new([myFlight1], 'E')
+# groupT.addTicket('M', 'Edsger','Dijkstra')
+# groupT.addTicket('F', 'Maria','Dijkstra')
+# puts groupT.to_s
+# groupT.hold
+# puts groupT.to_s
+# groupT.book
+# puts groupT.to_s
+# groupT.cancel
+# puts groupT.to_s
 # myCompoundTicket = CompoundTicket.new([myFlight1, myFlight2], 'E', 'M', 'Edsger', 'Dijkstra')
 # puts myCompoundTicket.hold
 # puts myCompoundTicket.to_s

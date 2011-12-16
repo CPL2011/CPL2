@@ -1,6 +1,5 @@
 require './Airport'
 require './pqueue'
-require './adameus'
 require './Date'
 require './Flight'
 
@@ -223,25 +222,25 @@ def printthis(l)
 end
 
 ##BEST EXAMPLE -- start = AMS, dest=BCN
-start = 'TEG'
-dest = 'AKL'
-p 'FIND SHORTEST '+start+'->'+dest
-ds = MultiDijkstraHop.new(Date.new("2011-12-11","06:00"),'B',5)
-l=ds.find_shortest(start,dest)
-printthis(l)
+# start = 'TEG'
+# dest = 'AKL'
+# p 'FIND SHORTEST '+start+'->'+dest
+# ds = MultiDijkstraHop.new(Date.new("2011-12-11","06:00"),'B',5)
+# l=ds.find_shortest(start,dest)
+# printthis(l)
 
-p 'FIND MOST QUICK '+start+'->'+dest
-l=ds.find_shortest_time(start,dest)
-printthis(l)
+# p 'FIND MOST QUICK '+start+'->'+dest
+# l=ds.find_shortest_time(start,dest)
+# printthis(l)
 
-p 'FIND CHEAPEST '+start+'->'+dest
-l=ds.find_cheapest(start,dest)
-printthis(l)
+# p 'FIND CHEAPEST '+start+'->'+dest
+# l=ds.find_cheapest(start,dest)
+# printthis(l)
 
-p 'FIND MOST EXPENSIVE '+start+'->'+dest
-l=ds.find_expensive(start,dest)
-printthis(l)
+# p 'FIND MOST EXPENSIVE '+start+'->'+dest
+# l=ds.find_expensive(start,dest)
+# printthis(l)
 
-p 'FIND OPTIMAL '+start+'->'+dest
-l=ds.find_optimal(start,dest)
-printthis(l)
+# p 'FIND OPTIMAL '+start+'->'+dest
+# l=ds.find_optimal(start,dest)
+# printthis(l)

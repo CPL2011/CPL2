@@ -1,10 +1,9 @@
 
 #require_relative 'Airport'
-require_relative 'Date'
-require_relative 'adameus'
+require './Date'
 # The Flight class represents a single, direct flight between two airports
 class Flight
-  attr_reader :flightCode,:seatprice, :date, :adameus, :departureTime, :flightDuration, :departureAirport, :destinationAirport, :seats
+  attr_reader :flightCode,:seatprice, :date, :departureTime, :flightDuration, :departureAirport, :destinationAirport, :seats
 
   def initialize(connCode, date)
     @flightCode = connCode[0,6]
@@ -17,7 +16,7 @@ class Flight
     @flightDuration = MyTime.new(connCode[11,5])
     @departureAirport = nil
     @destinationAirport = nil
-    #@adameus = Adameus.new 
+    # @adameus = Adameus.new 
     @seats = 0
     @seatprice = 9999
   end
