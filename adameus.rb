@@ -85,18 +85,19 @@ class Adameus
   def flight_airports(flightnumber)
     output = query_host("F" + flightnumber.to_s).chomp()
     if output == "FN"
-      raise "No such flightnumber"
+      return "No such flightnumber"
+    else return output
     end
-    return output
   end
   
   # returns the days of the week that the plane with the given flight number flies
   def weekdays(flightnumber)
     query_host("W" + flightnumber.to_s).chomp()
     if output == "FN"
-      raise "No such flightnumber"
+      puts "No such flightnumber"
+    else 
+      return output 
     end
-    return output
   end
   
   # returns the number of tickets available in the given class and on the given date and 
@@ -147,7 +148,7 @@ class Adameus
   end
 
   # If successful, returns the booking code(s) of the requested flight arrangement(s). 
-  # If unsuccessful returns an error. The booking codes will specify the connection that will 
+  # If unsuccessful returns a message. The booking codes will specify the connection that will 
   # allow the traveler to reach his destination in the quickest possible way
   # date : A String specifying the date
   # airportDepartureCode : a String specifying the airport from which the passenger departs.
@@ -170,49 +171,57 @@ class Adameus
   def hold(date, flightnumber, seatclass, gender, firstname, surname)
     firstname = firstname.to_s
     surname = surname.to_s
-    firstname.fix_length!(15)
-    surname.fix_length!(20)
+    begin 
+      firstname.fix_length!(15)
+      surname.fix_length!(20)
+    rescue 
+      puts $!.message
+    end
     output = query_host("H" + date.to_s + flightnumber.to_s + seatclass.to_s + gender.to_s + firstname + surname).chomp()
     if( output == "FN") then
-      raise "No seats available(" + output + ")"
+      puts "No seats available(" + output + ")"
+    else 
+      return output
     end
-    return output
   end
   
 
   # If successful, the flight associated with the given bookingcode gets booked
-  # If unsuccessful one of the following exceptions gets raised:
-  # An exception will be raised if the bookingcode length violates the expected length
-  # An exception will be raised if the Adameus server informs that the given bookingcode is invalid
-  # An exception will be raised if the Adameus server informs that the seat associated with the given 
+  # If unsuccessful one of the following messages gets printed:
+  # A message will be printed if the bookingcode length violates the expected length
+  # A message will be printed if the Adameus server informs that the given bookingcode is invalid
+  # A message will be printed if the Adameus server informs that the seat associated with the given 
   # bookingcode has already been booked.
   # bookingcode : A String representation of the bookingcode
   def book(bookingcode)
-    raise "An invalid bookingcode was given" if (bookingcode.length != 32)
-    output = query_host("B" + bookingcode.to_s) 
-    raise "An invalid booking code was given" if (output.chomp() == "FN")
-    raise "The requested seat has already been booked" if (output.chomp() == "FA")
-    return output
+    if (bookingcode.length != 32) then puts "An invalid bookingcode was given"
+    else 
+      output = query_host("B" + bookingcode.to_s)
+      if (output.chomp() == "FN") then puts "An invalid booking code was given" 
+      elsif (output.chomp() == "FA") then puts "The requested seat has already been booked" 
+      else return output
+      end
+    end
   end
     
   # If successful, cancels the holding/booking associated with the given bookingcode 
-  # If unsuccessful one of the following exceptions gets raised:
-  # An exception will be raised if the Adameus server informs that the given bookingcode is invalid
-  # An exception will be raised if the Adameus server informs that the cancel period has been exceeded
+  # If unsuccessful one of the following messages gets printed:
+  # A message will be printed if the Adameus server informs that the given bookingcode is invalid
+  # A message will be printed if the Adameus server informs that the cancel period has been exceeded
   # bookingocde: A String representation of the bookingcode
   def cancel(bookingcode)
     output = query_host("X" + bookingcode.to_s)
-    raise "An invalid booking code was given" if (output.chomp() == "FN")
-    raise "The booking is older than seven days and can no longer be cancelled" if (output.chomp() == "FX")
-    return output
+    if (output.chomp() == "FN") then puts "An invalid booking code was given" 
+    elsif (output.chomp() == "FX") then puts "The booking is older than seven days and can no longer be cancelled" 
+    else return output
+    end
   end
   
   def query_booking(bookingcode)
     output = query_host("Q" + bookingcode.to_s).chomp()
-    if output == "FN"
-      raise "No such bookingcode"
+    if (output == "FN") then puts  "No such bookingcode"
+    else return output
     end
-    return output
   end
 
   # def priceOfFlight(date, seatClass, airportDepartureCode, airportDestinationCode)
@@ -224,8 +233,7 @@ class Adameus
     file = File.open(path)
     file.each {|line|
       response = self.send(*line.split(/\s+/)) 
-      if(response.nil?)
-        puts 'Response Empty'
+      if(response.nil?) then puts 'Response Empty'
       else
         puts 'Response:'
         puts response
@@ -244,14 +252,16 @@ class Adameus
   # seatclass : a String/Char specifying the class of the seating arrangement
   # people : a list of Struct::Person which specifies the people for which the flight should be booked 
   def hold_helper(flights, seatclass, people)
-    raise "There is no flight satisfying the given requirements" if (flights.nil? || flights.length == 0)
-    ticket = GroupTicket.new(flights, seatclass)
-    people.each do |person|
-      ticket.addTicket(person.gender, person.firstname, person.surname)
+    if (flights.nil? || flights.length == 0) then puts "There is no flight satisfying the given requirements" 
+    else 
+      ticket = GroupTicket.new(flights, seatclass)
+      people.each do |person|
+        ticket.addTicket(person.gender, person.firstname, person.surname)
+      end
+      return ticket.hold   # hold GroupTicket will be responsible for handling potential rollback, 
+      # should also return the list of bookingcodes if successful. Probably raise an error
+      # in case a rollback was neccessary
     end
-    return ticket.hold   # hold GroupTicket will be responsible for handling potential rollback, 
-    # should also return the list of bookingcodes if successful. Probably raise an error
-    # in case a rollback was neccessary
   end
   
   private :open_host, :close_host, :query_host, :hold_helper # all methods listed here will be made private: not accessible for outside objects
@@ -276,7 +286,9 @@ def repl
   end
 end
 $adameus = Adameus.new
+puts $adameus.weekdays("lols")
 edsger_dijkstra = Person.new("M", "Edsger", "Dijkstra")
+puts $adameus.book("tralalalalal")
 puts $adameus.hold_cheapest("2012-01-15", "TEG", "AKL",  "B", "M, Edsger, Dijkstra", "M, John, McCarthy")
 #puts $adameus.version
 #puts $adameus.connections("VIE", "BRU", "2012-01-15")
