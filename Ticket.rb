@@ -30,14 +30,21 @@ class GroupTicket
   end
 
   def book
-    tickets.each do |ticket|
-      ticket.book
+    tickets.inject([]) do |all, ticket|
+      begin
+        ticket.book
+        all << ticket
+      rescue
+        all.each{|ticket| ticket.cancel}
+      end
     end
   end
 
   def cancel
     tickets.each do |ticket|
-      ticket.cancel
+      begin
+        ticket.cancel
+      end
     end
   end
   
