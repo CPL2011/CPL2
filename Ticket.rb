@@ -32,6 +32,7 @@ class GroupTicket
       end
     rescue
       holding.each{|ticket| ticket.cancel}
+      puts $!.message
     end
   end
 
@@ -42,6 +43,7 @@ class GroupTicket
       end
     rescue
       tickets.each{|ticket| ticket.cancel}
+      puts "Booking failed: " + $!.message
     end
   end
 
@@ -49,6 +51,7 @@ class GroupTicket
     tickets.each do |ticket|
       begin
         ticket.cancel
+      rescue
       end
     end
   end
@@ -101,20 +104,35 @@ class CompoundTicket
   end
 
   def hold
-    compoundTicket.each do |ticket| 
-      ticket.hold
+    holding = []
+    begin
+      compoundTicket.each do |ticket| 
+        ticket.hold
+        holding << ticket
+      end
+    rescue
+      holding.each{|ticket| ticket.cancel}
+      raise $!.message
     end
   end
 
   def book
-    compoundTicket.each do |ticket|
-      ticket.book
+    begin
+      compoundTicket.each do |ticket|
+        ticket.book
+      end
+    rescue
+      compoundTicket.each{|ticket| ticket.cancel}
+      raise "Booking failed"
     end
   end
 
   def cancel
     compoundTicket.each do |ticket|
-      ticket.cancel
+      begin
+        ticket.cancel
+      rescue
+      end
     end
   end
   
@@ -185,7 +203,7 @@ conns = adameus.connections('FRA', 'BRU', date).split(/\n/)
 conns2 = adameus.connections('BRU', 'VIE', date).split(/\n/)
 myFlight1 = Flight.new(conns[0], date)
 myFlight2 = Flight.new(conns2[0], date)
-groupT = GroupTicket.new([myFlight1, myFlight2], 'E')
+groupT = GroupTicket.new([myFlight1], 'E')
 groupT.addTicket('M', 'Edsger','Dijkstra')
 groupT.addTicket('F', 'Maria','Dijkstra')
 puts groupT.to_s
