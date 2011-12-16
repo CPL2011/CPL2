@@ -98,8 +98,22 @@ class CompoundTicket
     seat = "seat = " + seatclass + "\n"
     travelCost = "price = " + price.to_s + "\n"
     ticketClosure = "------------------------------\n"
+    i = 1
+    ticketsInfo = ""
+    @compoundTicket.each do |ticket|
+		ticketsInfo += "-----------TICKET "+i.to_s+" -------------\n"+
+							"Flight number: " + ticket.flight.flightCode.to_s + "\n"+
+							"From: " + ticket.flight.departureAirport.to_s + " To: " + ticket.flight.destinationAirport.to_s + "\n" +
+							"Departure: " + ticket.flight.date.to_s + "\n" +
+							"Duration: " + ticket.flight.flightDuration.to_s + "\n"+
+							"Price: " + ticket.flight.seatprice.to_s + "\n" +
+							
+		i+=1
+    end
+    ticketsInfo += ticketClosure
+    
 
-    return ticketOpening + status + customer + travel + seat + travelCost + ticketClosure
+    return ticketOpening + status + customer + travel + seat + travelCost + ticketClosure + ticketsInfo
   end
 
   def hold
