@@ -54,7 +54,7 @@ class GroupTicket
   end
   
   def status
-    tickets.each do |ticket|
+    return tickets.map do |ticket|
       ticket.status
     end
   end  
@@ -113,16 +113,13 @@ class CompoundTicket
   end
 
   def cancel
-    puts "ticket cancelled"
     compoundTicket.each do |ticket|
       ticket.cancel
     end
   end
   
   def status
-    compoundTicket.each do |ticket|
-      ticket.status
-    end
+    return compoundTicket.last.status
   end  
 end
 
@@ -173,6 +170,10 @@ class Ticket
       booking[:status] = "Cancelled"
     end
   end
+  
+  def status
+    return booking.status
+  end
 end
 
 Struct.new("Booking", :bookingCode, :timeStamp, :status, :price)
@@ -191,6 +192,8 @@ puts groupT.to_s
 groupT.hold
 puts groupT.to_s
 groupT.book
+puts groupT.to_s
+groupT.cancel
 puts groupT.to_s
 # myCompoundTicket = CompoundTicket.new([myFlight1, myFlight2], 'E', 'M', 'Edsger', 'Dijkstra')
 # puts myCompoundTicket.hold
