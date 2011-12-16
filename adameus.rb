@@ -85,7 +85,7 @@ class Adameus
   def flight_airports(flightnumber)
     output = query_host("F" + flightnumber.to_s).chomp()
     if output == "FN"
-      return "No such flightnumber"
+      puts "No such flightnumber"
     else return output
     end
   end
